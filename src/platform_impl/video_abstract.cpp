@@ -11,9 +11,9 @@ bool video_system_abstract_t::draw_sprite(uint8_t start_col, uint8_t start_row, 
     for (size_t row = 0; row < sprite.size(); ++row) {
         uint8_t sprite_byte = sprite[row];
         for (size_t col = 0; col < 8; ++col) {
-            // if (start_col + col >= VIDEO_WIDTH /* || start_row + row >= VIDEO_HEIGHT */) {
-            //     continue;
-            // }    
+            if (start_col + col >= VIDEO_WIDTH || start_row + row >= VIDEO_HEIGHT) {
+                continue;
+            }
 
             bool sprite_pixel = (sprite_byte >> (7 - col)) & 0x01;
 
@@ -24,7 +24,7 @@ bool video_system_abstract_t::draw_sprite(uint8_t start_col, uint8_t start_row, 
             if (sprite_pixel && screen_pixel) {
                 collision = true;
             }
-            screen_pixel = (screen_pixel != sprite_pixel);
+            screen_pixel ^= sprite_pixel;
         }
     }
 

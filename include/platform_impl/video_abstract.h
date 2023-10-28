@@ -1,7 +1,6 @@
 #pragma once
 
 #include <common.h>
-
 #include <platform_iface/video.h>
 
 
