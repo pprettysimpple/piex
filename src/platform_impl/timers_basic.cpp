@@ -28,7 +28,7 @@ void timers_system_basic_t::set_delay_timer(uint8_t value) {
 }
 
 void timers_system_basic_t::set_sound_timer(uint8_t value) {
-    sound_timer_ = value;
+    sound_timer_ = value; // TODO: implement
 }
 
 } // namespace chip8
