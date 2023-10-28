@@ -81,17 +81,17 @@ chip8::bytes_owned load_rom(std::string_view filename) {
     return buffer;
 }
 
-void launch_rom(std::string_view filename, std::string expected, uint64_t max_cycles) {
+void launch_rom(std::string_view filename, std::string expected, uint64_t max_cycles, uint64_t hz) {
     auto rom_bytes = load_rom(filename);
 
     env_t env;
     env.vm.load_data(rom_bytes, chip8::ROM_OFFSET);
 
-    env.vm.emulate(500, max_cycles);
+    env.vm.emulate(hz, max_cycles);
 
     auto actual = env.get_video_system().render_for_test();
 
-    ASSERT_STREQ(expected.data(), actual.data());
+    ASSERT_EQ(expected, actual);
 }
 
 
@@ -132,7 +132,7 @@ TEST(RomTests, Chip8Logo) {
 )";
     expected_image = expected_image.substr(1); // remove first newline
 
-    launch_rom("../../tests/data/1-chip8-logo.ch8", expected_image, 100);
+    launch_rom("../../tests/data/1-chip8-logo.ch8", expected_image, 100, 1000);
 }
 
 TEST(RomTests, IBMLogo) {
@@ -172,7 +172,7 @@ TEST(RomTests, IBMLogo) {
 )";
     expected_image = expected_image.substr(1); // remove first newline
 
-    launch_rom("../../tests/data/2-ibm-logo.ch8", expected_image, 100);
+    launch_rom("../../tests/data/2-ibm-logo.ch8", expected_image, 100, 1000);
 }
 
 TEST(RomTests, Corax) {
@@ -212,7 +212,7 @@ TEST(RomTests, Corax) {
 )";
     expected_image = expected_image.substr(1); // remove first newline
 
-    launch_rom("../../tests/data/3-corax+.ch8", expected_image, 500);
+    launch_rom("../../tests/data/3-corax+.ch8", expected_image, 500, 10000);
 }
 
 TEST(RomTests, Flags) {
@@ -252,7 +252,7 @@ TEST(RomTests, Flags) {
 )";
     expected_image = expected_image.substr(1); // remove first newline
 
-    launch_rom("../../tests/data/4-flags.ch8", expected_image, 1000);
+    launch_rom("../../tests/data/4-flags.ch8", expected_image, 1000, 10000);
 }
 
 TEST(RomTests, Quirks) {
@@ -297,13 +297,14 @@ TEST(RomTests, Quirks) {
     env_t env;
     env.vm.load_data(rom_bytes, chip8::ROM_OFFSET);
 
-    env.get_keyboard().pressed_keys[chip8::keyboard_key_t::KEY_0] = true; 
+    env.get_keyboard().pressed_keys[chip8::keyboard_key_t::KEY_1] = true;
     env.vm.emulate(500, 500);
-
-    env.get_keyboard().pressed_keys[chip8::keyboard_key_t::KEY_0] = false;
-    env.vm.emulate(500, 500 * 5);
+    env.get_keyboard().pressed_keys[chip8::keyboard_key_t::KEY_1] = false;
+    env.vm.emulate(500, 500 * 5 + 250);
 
     auto actual = env.get_video_system().render_for_test();
 
-    ASSERT_STREQ(expected_image.data(), actual.data());
+    printf("actual:\n%s\n", actual.data());
+
+    ASSERT_EQ(expected_image, actual);
 }
