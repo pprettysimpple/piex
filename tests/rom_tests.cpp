@@ -21,7 +21,7 @@ struct keyboard_mock_t : chip8::keyboard_system_iface_t {
     }
 
     chip8::keyboard_key_t wait_for_keypress() const noexcept override {
-        return chip8::keyboard_key_t::KEY_0;
+        return chip8::keyboard_key_t::KEY_0; // FIXME: implement
     }
 
     std::bitset<16> pressed_keys;
