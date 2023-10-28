@@ -17,3 +17,5 @@ target_link_libraries(rom_tests
                       piexlib)
 
 target_include_directories(rom_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+
+add_test(NAME rom_tests COMMAND rom_tests)
