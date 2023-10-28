@@ -92,7 +92,7 @@ struct vm_t {
 
     void emulate_one();
 
-    void emulate(const uint64_t hz = 500);
+    void emulate(const uint64_t hz, uint64_t max_cycles);
 
     void load_data(const bytes_view data, const size_t offset) noexcept;
 

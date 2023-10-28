@@ -36,13 +36,13 @@ void vm_t::emulate_one() {
     auto pc_copy = pc;
     const auto& [instruction_ref, opcode] = execute_instruction_pc();
 
-    std::printf("[addr][name][code] 0x%04X %s 0x%04X\n", pc_copy, instruction_ref.get().name.data(), opcode.bytes);
+    // std::printf("[addr][name][code] 0x%04X %s 0x%04X\n", pc_copy, instruction_ref.get().name.data(), opcode.bytes);
 }
 
-void vm_t::emulate(const uint64_t hz) {
+void vm_t::emulate(const uint64_t hz, uint64_t max_cycles) {
     auto target_duration = std::chrono::nanoseconds(1'000'000'000 / hz);
 
-    while (true) {
+    while (max_cycles-- > 0) {
         auto start_exec_timestamp = std::chrono::high_resolution_clock::now();
 
         emulate_one();

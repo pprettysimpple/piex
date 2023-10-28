@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <limits>
 #include <memory>
 #include <sstream>
 #include <string_view>
@@ -12,13 +13,22 @@
 #include <vm.h>
 
 
-// filename of rom to load
+// filename of rom to load and optional max cycles to emulate
 int main(int argc, char** argv)
 {
-    if (argc != 2) {
+    if (argc < 2) {
         std::cerr << "usage: " << argv[0] << " <rom>" << std::endl;
         return 1;
     }
+
+    uint64_t max_cycles = std::invoke([=]{
+        if (argc == 3) {
+            return static_cast<uint64_t>(std::stoull(argv[2]));
+        }
+        else {
+            return std::numeric_limits<uint64_t>::max();
+        }
+    });
 
     std::string_view rom_filename(argv[1]);
 
@@ -36,13 +46,13 @@ int main(int argc, char** argv)
     auto vm = std::make_unique<chip8::vm_t>(
         std::make_unique<chip8::keyboard_system_fake_t>(),
         std::make_unique<chip8::timers_system_basic_t>(),
-        std::make_unique<chip8::video_system_none_t>()
+        std::make_unique<chip8::video_system_ascii_t>()
     );
 
     vm->load_data(rom, chip8::ROM_OFFSET);
     vm->load_data(chip8::CHIP8_STANDARD_FONTSET_VIEW, 0);
 
-    vm->emulate(500);
+    vm->emulate(500, max_cycles);
 
     return 0;
 }
