@@ -42,8 +42,6 @@ int main(int argc, char** argv)
     vm->load_data(rom, chip8::ROM_OFFSET);
     vm->load_data(chip8::CHIP8_STANDARD_FONTSET_VIEW, 0);
 
-    vm->memory[511] = 1; // todo: remove this hack
-
     vm->emulate(500);
 
     return 0;

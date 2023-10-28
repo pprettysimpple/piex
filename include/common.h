@@ -62,13 +62,4 @@ enum keyboard_key_t : uint8_t {
     KEY_F = 0xF
 };
 
-enum instruction_side_effects_t : uint8_t {
-    NONE = 0,
-    RENDER_VIDEO = 1 << 0,
-};
-
-inline instruction_side_effects_t operator&(const instruction_side_effects_t lhs, const instruction_side_effects_t rhs) noexcept {
-    return static_cast<instruction_side_effects_t>(static_cast<uint8_t>(lhs) & static_cast<uint8_t>(rhs));
-}
-
 } // namespace chip8

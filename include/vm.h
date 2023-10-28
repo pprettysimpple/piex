@@ -54,7 +54,6 @@ struct vm_t {
 
     struct instruction_t {
         std::string_view name;
-        instruction_side_effects_t settings;
 
         using executor_t = void (*)(vm_t&, const vm_t::opcode_t&);
         const executor_t executor;
@@ -101,8 +100,6 @@ struct vm_t {
 
     decoded_instruction_t execute_instruction_pc();
     void execute_instruction_decoded(const decoded_instruction_t& decoded_instruction);
-
-    void process_side_effects(const instruction_side_effects_t settings);
 };
 
 } // namespace chip8
