@@ -18,7 +18,7 @@ void video_system_ascii_t::render() {
     
     for (size_t i = 0; i < VIDEO_HEIGHT; ++i) {
         for (size_t j = 0; j < VIDEO_WIDTH; ++j) {
-            frame << (memory[i][j] ? '#' : ' ');
+            frame << (memory[i][j] ? '#' : '.');
         }
         frame << '\n';
     }
