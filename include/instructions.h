@@ -110,6 +110,10 @@ inline constexpr auto OR_VX_VY = vm_t::instruction_t{
     
     [](vm_t& vm, const vm_t::opcode_t& opcode) {
         vm.V[opcode.get_x()] |= vm.V[opcode.get_y()];
+
+        // TODO: make setting for this quirk
+        vm.V[0xF] = 0;
+
         vm.next_instruction();
     }
 };
@@ -118,6 +122,10 @@ inline constexpr auto AND_VX_VY = vm_t::instruction_t{
     "AND_VX_VY",
     [](vm_t& vm, const vm_t::opcode_t& opcode) {
         vm.V[opcode.get_x()] &= vm.V[opcode.get_y()];
+
+        // TODO: make setting for this quirk
+        vm.V[0xF] = 0;
+
         vm.next_instruction();
     }
 };
@@ -126,6 +134,10 @@ inline constexpr auto XOR_VX_VY = vm_t::instruction_t{
     "XOR_VX_VY",
     [](vm_t& vm, const vm_t::opcode_t& opcode) {
         vm.V[opcode.get_x()] ^= vm.V[opcode.get_y()];
+
+        // TODO: make setting for this quirk
+        vm.V[0xF] = 0;
+
         vm.next_instruction();
     }
 };
