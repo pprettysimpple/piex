@@ -19,11 +19,13 @@
 namespace chip8 {
 
 vm_t::vm_t(
+    settings_t&& settings,
     keyboard_system_iface_t& keyboard_system,
     timers_system_iface_t& timers_system,
     video_system_iface_t& video_system
 ) noexcept
-    : I(0)
+    : settings(std::move(settings))
+    , I(0)
     , pc(ROM_OFFSET)
     , sp(0)
     , keyboard_system(keyboard_system)
@@ -39,13 +41,13 @@ void vm_t::emulate_one() {
     auto pc_copy = pc;
     const auto& [instruction_ref, opcode] = execute_instruction_pc();
 
-    // std::printf("[addr][name][code] 0x%04X %s 0x%04X\n", pc_copy, instruction_ref.get().name.data(), opcode.bytes);
+    std::printf("[addr][name][code] 0x%04X %s 0x%04X\n", pc_copy, instruction_ref.get().name.data(), opcode.bytes);
 }
 
-void vm_t::emulate(const uint64_t hz, uint64_t max_cycles) {
-    auto target_duration = std::chrono::nanoseconds(1'000'000'000 / hz);
+void vm_t::emulate() {
+    auto target_duration = std::chrono::nanoseconds(1'000'000'000 / settings.hz);
 
-    while (max_cycles-- > 0) {
+    while (settings.max_cycles-- > 0) {
         auto start_exec_timestamp = std::chrono::high_resolution_clock::now();
 
         emulate_one();

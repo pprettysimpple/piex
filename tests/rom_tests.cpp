@@ -53,8 +53,9 @@ struct env_t {
 
     chip8::vm_t vm;
 
-    env_t() 
+    env_t(chip8::vm_t::settings_t settings = {}) 
         : vm(
+            std::move(settings),
             *keyboard_system,
             *timers_system,
             *video_system
@@ -90,10 +91,14 @@ chip8::bytes_owned load_rom(std::string_view filename) {
 void launch_rom(std::string_view filename, std::string expected, uint64_t max_cycles, uint64_t hz) {
     auto rom_bytes = load_rom(filename);
 
-    env_t env;
+    env_t env({
+        .emulator_type = chip8::vm_t::settings_t::CHIP_8,
+        .hz = hz,
+        .max_cycles = max_cycles,
+    });
     env.vm.load_data(rom_bytes, chip8::ROM_OFFSET);
 
-    env.vm.emulate(hz, max_cycles);
+    env.vm.emulate();
 
     auto actual = env.get_video_system().render_for_test();
 
@@ -300,13 +305,19 @@ TEST(RomTests, Quirks) {
 
     auto rom_bytes = load_rom("../../tests/data/5-quirks.ch8");
 
-    env_t env;
+    env_t env({
+        .emulator_type = chip8::vm_t::settings_t::CHIP_8,
+        .hz = 500,
+        .max_cycles = 500,
+    });
     env.vm.load_data(rom_bytes, chip8::ROM_OFFSET);
 
     env.get_keyboard().pressed_keys[chip8::keyboard_key_t::KEY_1] = true;
-    env.vm.emulate(500, 500);
+    env.vm.emulate();
+    
+    env.vm.settings.max_cycles = 500 * 5 + 250;
     env.get_keyboard().pressed_keys[chip8::keyboard_key_t::KEY_1] = false;
-    env.vm.emulate(500, 500 * 5 + 250);
+    env.vm.emulate();
 
     auto actual = env.get_video_system().render_for_test();
 

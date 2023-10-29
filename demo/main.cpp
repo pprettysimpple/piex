@@ -45,10 +45,17 @@ int main(int argc, char** argv)
         return buffer;
     });
 
+    auto settings = chip8::vm_t::settings_t{
+        .emulator_type = chip8::vm_t::settings_t::CHIP_8,
+        .hz = 500,
+        .max_cycles = std::numeric_limits<uint64_t>::max(),
+    };
+
 #if 1
     auto sdl_impl = std::make_unique<chip8::sdl::sdl_system_facade_t>();
 
     auto vm = std::make_unique<chip8::vm_t>(
+        std::move(settings),
         *sdl_impl,
         *sdl_impl,
         *sdl_impl
@@ -59,6 +66,7 @@ int main(int argc, char** argv)
     auto video_system = std::make_unique<chip8::video_system_ascii_t>();
 
     auto vm = std::make_unique<chip8::vm_t>(
+        std::move(settings),
         *keyboard_system,
         *timers_system,
         *video_system
@@ -68,7 +76,7 @@ int main(int argc, char** argv)
     vm->load_data(rom, chip8::ROM_OFFSET);
     vm->load_data(chip8::CHIP8_STANDARD_FONTSET_VIEW, 0);
 
-    vm->emulate(500, max_cycles);
+    vm->emulate();
 
     return 0;
 }

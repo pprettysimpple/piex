@@ -4,6 +4,7 @@
 #include <bitset>
 #include <cstdint>
 #include <functional>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <string_view>
@@ -17,6 +18,19 @@
 namespace chip8 {
 
 struct vm_t {
+    struct settings_t {
+        enum emulator_type_t {
+            CHIP_8,
+            SCHIP1_1,
+            SCHIP_C,
+            XO_CHIP,
+        };
+
+        emulator_type_t emulator_type = CHIP_8;
+        uint64_t hz = 500;
+        uint64_t max_cycles = std::numeric_limits<uint64_t>::max();      
+    };
+
     struct opcode_t {
         uint16_t bytes;
 
@@ -61,6 +75,9 @@ struct vm_t {
 
     using decoded_instruction_t = std::tuple<std::reference_wrapper<const vm_t::instruction_t>, vm_t::opcode_t>;
 
+    // settings
+    settings_t settings;
+
     // registers
     std::array<uint8_t, REGISTERS_SIZE> V;
     uint16_t I;
@@ -78,6 +95,7 @@ struct vm_t {
 
 
     explicit vm_t(
+        settings_t&& settings,
         keyboard_system_iface_t& keyboard_system,
         timers_system_iface_t& timers_system,
         video_system_iface_t& video_system
@@ -92,7 +110,7 @@ struct vm_t {
 
     void emulate_one();
 
-    void emulate(const uint64_t hz, uint64_t max_cycles);
+    void emulate();
 
     void load_data(const bytes_view data, const size_t offset) noexcept;
 
