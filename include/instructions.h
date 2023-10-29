@@ -112,8 +112,9 @@ inline constexpr auto OR_VX_VY = vm_t::instruction_t{
     [](vm_t& vm, const vm_t::opcode_t& opcode) {
         vm.V[opcode.get_x()] |= vm.V[opcode.get_y()];
 
-        // TODO: make setting for this quirk
-        vm.V[0xF] = 0;
+        if (vm.settings.emulator_type == vm_t::settings_t::emulator_type_t::CHIP_8) {
+            vm.V[0xF] = 0;
+        }
 
         vm.next_instruction();
     }
@@ -124,8 +125,9 @@ inline constexpr auto AND_VX_VY = vm_t::instruction_t{
     [](vm_t& vm, const vm_t::opcode_t& opcode) {
         vm.V[opcode.get_x()] &= vm.V[opcode.get_y()];
 
-        // TODO: make setting for this quirk
-        vm.V[0xF] = 0;
+        if (vm.settings.emulator_type == vm_t::settings_t::emulator_type_t::CHIP_8) {
+            vm.V[0xF] = 0;
+        }
 
         vm.next_instruction();
     }
@@ -136,8 +138,9 @@ inline constexpr auto XOR_VX_VY = vm_t::instruction_t{
     [](vm_t& vm, const vm_t::opcode_t& opcode) {
         vm.V[opcode.get_x()] ^= vm.V[opcode.get_y()];
 
-        // TODO: make setting for this quirk
-        vm.V[0xF] = 0;
+        if (vm.settings.emulator_type == vm_t::settings_t::emulator_type_t::CHIP_8) {
+            vm.V[0xF] = 0;
+        }
 
         vm.next_instruction();
     }
@@ -357,8 +360,9 @@ inline constexpr auto LD_I_VX = vm_t::instruction_t{
             vm.memory[vm.I + i] = vm.V[i];
         }
 
-        // TODO: make setting for incrementing I
-        vm.I += size + 1;
+        if (vm.settings.emulator_type == vm_t::settings_t::emulator_type_t::CHIP_8) {
+            vm.I += size + 1;
+        }
 
         vm.next_instruction();
     }
@@ -372,8 +376,9 @@ inline constexpr auto LD_VX_I = vm_t::instruction_t{
             vm.V[i] = vm.memory[vm.I + i];
         }
         
-        // TODO: make setting for incrementing I
-        vm.I += size + 1;
+        if (vm.settings.emulator_type == vm_t::settings_t::emulator_type_t::CHIP_8) {
+            vm.I += size + 1;
+        }
         
         vm.next_instruction();
     }
