@@ -8,6 +8,7 @@ Currently only SDL2 or ascii-art are available.
 
 - [Build](#build)
 - [Usage](#usage)
+- [TODO](#todo)
 
 ## Build
 
@@ -23,7 +24,7 @@ Then you can build project with cmake:
 mkdir build
 cd build
 cmake ..
-ninja piexapp
+ninja all
 ```
 
 And to clean build directory after some builds:
@@ -35,10 +36,14 @@ ninja clean
 ## Usage
 
 ```bash
-./piexapp <path_to_rom>
+./build/piexapp <sdl|ascii> <path_to_rom>
 ```
 
-This will run emulator with SDL2 or ascii-art system implementation. Depending on stupid `#if` in `demo/main.cpp` code.
+This will run emulator with SDL2 or ascii-art system implementation. Depending on argument.
 
-SDL2 implementation is very buggy and not finished. It is not recommended to use it.
-Actually, it is not recommended to use this emulator at all, cause it is not finished yet. `:)`
+## TODO
+
+- Add sound
+- Incapsulate quirks logic into core
+- Deal with timers, quirks for original chip-8 still does not work properly
+- Implement rest of opcodes
