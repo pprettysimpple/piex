@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include <common.h>
+#include <thread>
 #include <vm.h>
 
 namespace chip8 {
@@ -165,8 +166,8 @@ inline constexpr auto SUB_VX_VY = vm_t::instruction_t{
         // check underflow
         auto& target = vm.V[opcode.get_x()];
         auto value = vm.V[opcode.get_y()];
-        int16_t result = target - value;
-        target = result;
+        int16_t result = static_cast<int16_t>(target) - static_cast<int16_t>(value);
+        target = static_cast<uint8_t>(result);
         if (result > 0) {
             vm.V[0xF] = 1;
         } else {
@@ -193,8 +194,8 @@ inline constexpr auto SUBN_VX_VY = vm_t::instruction_t{
         // check underflow
         auto& target = vm.V[opcode.get_x()];
         auto value = vm.V[opcode.get_y()];
-        int16_t result = value - target;
-        target = result;
+        int16_t result = static_cast<int16_t>(value) - static_cast<int16_t>(target);
+        target = static_cast<uint8_t>(result);
         if (result > 0) {
             vm.V[0xF] = 1;
         } else {
