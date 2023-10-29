@@ -13,7 +13,12 @@ struct video_system_abstract_t : video_system_iface_t {
 
     virtual void clear_screen() override;
 
+    virtual void render() override;
+
     virtual ~video_system_abstract_t() override = default;
+
+protected:
+    virtual void render_impl() = 0;
 
     memory_t memory;
 };

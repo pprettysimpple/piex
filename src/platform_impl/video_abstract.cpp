@@ -40,4 +40,8 @@ void video_system_abstract_t::clear_screen() {
     render();
 }
 
+void video_system_abstract_t::render() {
+    render_impl();
+}
+
 } // namespace chip8

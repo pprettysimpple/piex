@@ -10,7 +10,7 @@ video_system_ascii_t::video_system_ascii_t() {
     clear_screen();
 }
 
-void video_system_ascii_t::render() {
+void video_system_ascii_t::render_impl() {
     std::stringstream frame;
     frame << "\033[2J\033[1;1H";
 

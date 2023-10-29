@@ -8,7 +8,7 @@
 namespace chip8 {
 
 struct video_system_none_t : video_system_abstract_t {
-    void render() override;
+    void render_impl() override;
 };
 
 } // namespace chip8

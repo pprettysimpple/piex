@@ -6,6 +6,6 @@
 
 namespace chip8 {
 
-void video_system_none_t::render() {}
+void video_system_none_t::render_impl() {}
 
 } // namespace chip8
