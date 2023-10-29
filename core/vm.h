@@ -11,6 +11,7 @@
 
 #include <core/common.h>
 #include <core/iface/keyboard.h>
+#include <core/iface/random.h>
 #include <core/iface/timers.h>
 #include <core/iface/video.h>
 
@@ -92,13 +93,15 @@ struct vm_t {
     keyboard_system_iface_t& keyboard_system;
     timers_system_iface_t& timers_system;
     video_system_iface_t& video_system;
+    random_system_iface_t& random_system;
 
 
     explicit vm_t(
         settings_t&& settings,
         keyboard_system_iface_t& keyboard_system,
         timers_system_iface_t& timers_system,
-        video_system_iface_t& video_system
+        video_system_iface_t& video_system,
+        random_system_iface_t& random_system
     ) noexcept;
 
     vm_t(const vm_t&) = delete;

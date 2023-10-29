@@ -45,6 +45,7 @@ int main(int argc, char** argv)
             std::move(settings),
             *sdl_impl,
             *sdl_impl,
+            *sdl_impl,
             *sdl_impl
         );
 
@@ -58,12 +59,14 @@ int main(int argc, char** argv)
         auto keyboard_system = std::make_unique<chip8::keyboard_system_fake_t>();
         auto timers_system = std::make_unique<chip8::timers_system_basic_t>();
         auto video_system = std::make_unique<chip8::video_system_ascii_t>();
+        auto random_system = std::make_unique<chip8::random_system_crand_t>();
 
         auto vm = std::make_unique<chip8::vm_t>(
             std::move(settings),
             *keyboard_system,
             *timers_system,
-            *video_system
+            *video_system,
+            *random_system
         );
 
         vm->load_data(rom, chip8::ROM_OFFSET);

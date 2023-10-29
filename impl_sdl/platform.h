@@ -9,13 +9,17 @@
 #include <core/common.h>
 #include <core/iface/keyboard.h>
 
+#include <impl_basic/random_crand.h>
 #include <impl_basic/timers_basic.h>
 #include <impl_basic/video_abstract.h>
 
 
 namespace chip8::sdl {
 
-struct sdl_system_facade_t : video_system_abstract_t, keyboard_system_iface_t, timers_system_basic_t {
+struct sdl_system_facade_t : video_system_abstract_t,
+                             keyboard_system_iface_t,
+                             timers_system_basic_t,
+                             random_system_crand_t {
     static inline constexpr int PIXEL_SIZE = 8;
 
     // keymap

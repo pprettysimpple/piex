@@ -11,6 +11,7 @@
 #include <core/instructions.h>
 #include <core/vm.h>
 
+#include <impl_basic/random_crand.h>
 #include <impl_basic/timers_basic.h>
 #include <impl_basic/video_none.h>
 
@@ -51,6 +52,7 @@ struct env_t {
     std::unique_ptr<keyboard_mock_t> keyboard_system = std::make_unique<keyboard_mock_t>();
     std::unique_ptr<chip8::timers_system_basic_t> timers_system = std::make_unique<chip8::timers_system_basic_t>();
     std::unique_ptr<video_system_mock_t> video_system = std::make_unique<video_system_mock_t>();
+    std::unique_ptr<chip8::random_system_crand_t> random_system = std::make_unique<chip8::random_system_crand_t>();
 
     chip8::vm_t vm;
 
@@ -59,7 +61,8 @@ struct env_t {
             std::move(settings),
             *keyboard_system,
             *timers_system,
-            *video_system
+            *video_system,
+            *random_system
         )
     {
         vm.load_data(chip8::CHIP8_STANDARD_FONTSET_VIEW, 0);
