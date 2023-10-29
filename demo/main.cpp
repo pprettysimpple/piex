@@ -12,6 +12,8 @@
 #include <platform_impl/video_none.h>
 #include <vm.h>
 
+#include <sdl_platform.h>
+
 
 // filename of rom to load and optional max cycles to emulate
 int main(int argc, char** argv)
@@ -43,6 +45,15 @@ int main(int argc, char** argv)
         return buffer;
     });
 
+#if 1
+    auto sdl_impl = std::make_unique<chip8::sdl::sdl_system_facade_t>();
+
+    auto vm = std::make_unique<chip8::vm_t>(
+        *sdl_impl,
+        *sdl_impl,
+        *sdl_impl
+    );
+#else
     auto keyboard_system = std::make_unique<chip8::keyboard_system_fake_t>();
     auto timers_system = std::make_unique<chip8::timers_system_basic_t>();
     auto video_system = std::make_unique<chip8::video_system_ascii_t>();
@@ -52,6 +63,7 @@ int main(int argc, char** argv)
         *timers_system,
         *video_system
     );
+#endif
 
     vm->load_data(rom, chip8::ROM_OFFSET);
     vm->load_data(chip8::CHIP8_STANDARD_FONTSET_VIEW, 0);
