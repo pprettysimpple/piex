@@ -23,15 +23,6 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    uint64_t max_cycles = std::invoke([=]{
-        if (argc == 3) {
-            return static_cast<uint64_t>(std::stoull(argv[2]));
-        }
-        else {
-            return std::numeric_limits<uint64_t>::max();
-        }
-    });
-
     std::string_view rom_filename(argv[1]);
 
     // read rom from file
@@ -51,7 +42,7 @@ int main(int argc, char** argv)
         .max_cycles = std::numeric_limits<uint64_t>::max(),
     };
 
-#if 1
+#if ENABLE_SDL
     auto sdl_impl = std::make_unique<chip8::sdl::sdl_system_facade_t>();
 
     auto vm = std::make_unique<chip8::vm_t>(

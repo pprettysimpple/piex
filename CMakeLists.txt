@@ -35,6 +35,8 @@ cmake_print_variables(PIEXAPP_SOURCES)
 
 add_executable(piexapp ${PIEXAPP_SOURCES})
 
+add_compile_definitions(ENABLE_SDL=1)
+
 target_link_libraries(piexapp piex)
 target_link_libraries(piexapp piexsdl)
 target_include_directories(piexapp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
