@@ -8,12 +8,12 @@
 #include <iomanip>
 #include <iostream>
 
-#include <common.h>
-#include <instructions.h>
-#include <platform_iface/keyboard.h>
-#include <platform_iface/timers.h>
-#include <platform_iface/video.h>
-#include <vm.h>
+#include <core/common.h>
+#include <core/iface/keyboard.h>
+#include <core/iface/timers.h>
+#include <core/iface/video.h>
+#include <core/instructions.h>
+#include <core/vm.h>
 
 
 namespace chip8 {
@@ -40,6 +40,8 @@ vm_t::vm_t(
 void vm_t::emulate_one() {
     auto pc_copy = pc;
     const auto& [instruction_ref, opcode] = execute_instruction_pc();
+
+    timers_system.update_timers(settings.hz);
 
     // std::printf("[addr][name][code] 0x%04X %s 0x%04X\n", pc_copy, instruction_ref.get().name.data(), opcode.bytes);
 }

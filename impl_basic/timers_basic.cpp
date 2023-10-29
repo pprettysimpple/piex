@@ -1,8 +1,7 @@
-#include <bits/chrono.h>
+#include "timers_basic.h"
+
 #include <iostream>
 #include <sstream>
-
-#include <platform_impl/timers_basic.h>
 
 
 namespace chip8 {

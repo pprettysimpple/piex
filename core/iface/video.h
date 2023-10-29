@@ -4,7 +4,7 @@
 #include <functional>
 #include <memory>
 
-#include <common.h>
+#include <core/common.h>
 
 namespace chip8 {
 

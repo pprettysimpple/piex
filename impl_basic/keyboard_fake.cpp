@@ -1,7 +1,8 @@
+#include "keyboard_fake.h"
+
 #include <cstdio>
 
-#include <common.h>
-#include <platform_impl/keyboard_fake.h>
+#include <core/common.h>
 
 
 namespace chip8 {

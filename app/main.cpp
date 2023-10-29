@@ -5,14 +5,15 @@
 #include <sstream>
 #include <string_view>
 
-#include <instructions.h>
-#include <platform_impl/keyboard_fake.h>
-#include <platform_impl/timers_basic.h>
-#include <platform_impl/video_ascii.h>
-#include <platform_impl/video_none.h>
-#include <vm.h>
+#include <core/instructions.h>
+#include <core/vm.h>
 
-#include <sdl_platform.h>
+#include <impl_basic/keyboard_fake.h>
+#include <impl_basic/timers_basic.h>
+#include <impl_basic/video_ascii.h>
+#include <impl_basic/video_none.h>
+
+#include <impl_sdl/platform.h>
 
 
 // filename of rom to load and optional max cycles to emulate

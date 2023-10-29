@@ -2,7 +2,7 @@
 
 #include <cstdlib>
 
-#include <platform_iface/keyboard.h>
+#include <core/iface/keyboard.h>
 
 
 namespace chip8 {

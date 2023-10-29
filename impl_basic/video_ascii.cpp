@@ -1,7 +1,7 @@
+#include "video_ascii.h"
+
 #include <iostream>
 #include <sstream>
-
-#include <platform_impl/video_ascii.h>
 
 
 namespace chip8 {

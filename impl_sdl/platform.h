@@ -6,10 +6,11 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
 
-#include <common.h>
-#include <platform_iface/keyboard.h>
-#include <platform_impl/timers_basic.h>
-#include <platform_impl/video_abstract.h>
+#include <core/common.h>
+#include <core/iface/keyboard.h>
+
+#include <impl_basic/timers_basic.h>
+#include <impl_basic/video_abstract.h>
 
 
 namespace chip8::sdl {

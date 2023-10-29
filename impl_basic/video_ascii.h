@@ -1,8 +1,8 @@
 #pragma once
 
-#include <common.h>
+#include <core/common.h>
 
-#include <platform_impl/video_abstract.h>
+#include <impl_basic/video_abstract.h>
 
 
 namespace chip8 {

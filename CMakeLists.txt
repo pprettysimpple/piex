@@ -7,39 +7,48 @@ set(CMAKE_CXX_STANDARD 20)
 
 include(CMakePrintHelpers)
 
-# static lib piex
-file(GLOB_RECURSE PIEX_SOURCES src/*.cpp)
-cmake_print_variables(PIEX_SOURCES)
+# static lib piexcore
+file(GLOB_RECURSE PIEXCORE_SOURCES core/*.cpp)
+cmake_print_variables(PIEXCORE_SOURCES)
 
-add_library(piex STATIC ${PIEX_SOURCES})
+add_library(piexcore STATIC ${PIEXCORE_SOURCES})
 
-target_include_directories(piex PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(piexcore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+
+# static lib piexbasic
+file(GLOB_RECURSE PIEXBASIC_SOURCES impl_basic/*.cpp)
+cmake_print_variables(PIEXBASIC_SOURCES)
+
+add_library(piexbasic STATIC ${PIEXBASIC_SOURCES})
+target_link_libraries(piexbasic PUBLIC piexcore)
+
+target_include_directories(piexbasic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 
 
 # static lib piexsdl
 find_package(SDL2 REQUIRED)
 
-file(GLOB_RECURSE PIEX_SDL_SOURCES sdl_impl/*.cpp)
+file(GLOB_RECURSE PIEX_SDL_SOURCES impl_sdl/*.cpp)
 cmake_print_variables(PIEX_SDL_SOURCES)
 
 add_library(piexsdl STATIC ${PIEX_SDL_SOURCES})
 
 target_link_libraries(piexsdl PUBLIC SDL2)
-target_link_libraries(piexsdl PUBLIC piex)
-target_include_directories(piexsdl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(piexsdl PUBLIC piexcore)
+target_include_directories(piexsdl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 
 # executable piexapp
-file(GLOB_RECURSE PIEXAPP_SOURCES demo/*.cpp)
+file(GLOB_RECURSE PIEXAPP_SOURCES app/*.cpp)
 cmake_print_variables(PIEXAPP_SOURCES)
 
 add_executable(piexapp ${PIEXAPP_SOURCES})
 
-add_compile_definitions(ENABLE_SDL=1)
-
-target_link_libraries(piexapp piex)
+target_link_libraries(piexapp piexcore)
+target_link_libraries(piexapp piexbasic)
 target_link_libraries(piexapp piexsdl)
-target_include_directories(piexapp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(piexapp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/sdl_impl)
+target_include_directories(piexapp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory(tests)

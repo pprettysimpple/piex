@@ -1,7 +1,7 @@
+#include "video_abstract.h"
+
 #include <iostream>
 #include <sstream>
-
-#include <platform_impl/video_abstract.h>
 
 
 namespace chip8 {

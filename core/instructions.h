@@ -7,9 +7,9 @@
 
 #include <iostream>
 
-#include <common.h>
-#include <thread>
-#include <vm.h>
+#include <core/common.h>
+#include <core/vm.h>
+
 
 namespace chip8 {
 

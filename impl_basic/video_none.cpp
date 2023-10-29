@@ -1,7 +1,7 @@
+#include "video_none.h"
+
 #include <iostream>
 #include <sstream>
-
-#include <platform_impl/video_none.h>
 
 
 namespace chip8 {

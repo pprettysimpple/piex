@@ -9,10 +9,10 @@
 #include <optional>
 #include <string_view>
 
-#include <common.h>
-#include <platform_iface/keyboard.h>
-#include <platform_iface/timers.h>
-#include <platform_iface/video.h>
+#include <core/common.h>
+#include <core/iface/keyboard.h>
+#include <core/iface/timers.h>
+#include <core/iface/video.h>
 
 
 namespace chip8 {

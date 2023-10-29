@@ -7,11 +7,12 @@
 
 #include <gtest/gtest.h>
 
-#include <common.h>
-#include <instructions.h>
-#include <platform_impl/timers_basic.h>
-#include <platform_impl/video_none.h>
-#include <vm.h>
+#include <core/common.h>
+#include <core/instructions.h>
+#include <core/vm.h>
+
+#include <impl_basic/timers_basic.h>
+#include <impl_basic/video_none.h>
 
 
 

@@ -2,9 +2,8 @@
 
 #include <chrono>
 
-#include <common.h>
-
-#include <platform_iface/timers.h>
+#include <core/common.h>
+#include <core/iface/timers.h>
 
 
 namespace chip8 {
