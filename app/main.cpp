@@ -1,22 +1,17 @@
 #include <iostream>
 #include <fstream>
 #include <limits>
-#include <memory>
 #include <sstream>
-#include <string_view>
 
-#include <core/instructions.h>
 #include <core/vm.h>
 
 #include <impl_basic/keyboard_fake.h>
 #include <impl_basic/timers_basic.h>
 #include <impl_basic/video_ascii.h>
-#include <impl_basic/video_none.h>
 
 #include <impl_sdl/platform.h>
 
 
-// filename of rom to load and optional max cycles to emulate
 int main(int argc, char** argv)
 {
     if (argc < 3) {
