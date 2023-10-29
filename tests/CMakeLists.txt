@@ -14,7 +14,7 @@ add_executable(rom_tests rom_tests.cpp)
 target_link_libraries(rom_tests
                       PRIVATE
                       GTest::GTest
-                      piexlib)
+                      piex)
 
 target_include_directories(rom_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 

@@ -41,7 +41,7 @@ void vm_t::emulate_one() {
     auto pc_copy = pc;
     const auto& [instruction_ref, opcode] = execute_instruction_pc();
 
-    std::printf("[addr][name][code] 0x%04X %s 0x%04X\n", pc_copy, instruction_ref.get().name.data(), opcode.bytes);
+    // std::printf("[addr][name][code] 0x%04X %s 0x%04X\n", pc_copy, instruction_ref.get().name.data(), opcode.bytes);
 }
 
 void vm_t::emulate() {
