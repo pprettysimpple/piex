@@ -23,12 +23,9 @@ bool timers_system_basic_t::is_sound_active() {
 }
 
 void timers_system_basic_t::update_timers(uint64_t vm_hz) {
-    if (ticks_ % (vm_hz / TARGET_HZ) != 0) {
-        ticks_++;
+    if (ticks_++ % (vm_hz / TARGET_HZ) != 0) {
         return;
     }
-
-    ticks_++;
 
     if (delay_timer_ > 0) {
         delay_timer_--;
