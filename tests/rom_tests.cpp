@@ -143,7 +143,7 @@ TEST(RomTests, Chip8Logo) {
 )";
     expected_image = expected_image.substr(1); // remove first newline
 
-    launch_rom("../../tests/data/1-chip8-logo.ch8", expected_image, 100, 1000);
+    launch_rom("tests/data/1-chip8-logo.ch8", expected_image, 100, 1000);
 }
 
 TEST(RomTests, IBMLogo) {
@@ -183,7 +183,7 @@ TEST(RomTests, IBMLogo) {
 )";
     expected_image = expected_image.substr(1); // remove first newline
 
-    launch_rom("../../tests/data/2-ibm-logo.ch8", expected_image, 100, 1000);
+    launch_rom("tests/data/2-ibm-logo.ch8", expected_image, 100, 1000);
 }
 
 TEST(RomTests, Corax) {
@@ -223,7 +223,7 @@ TEST(RomTests, Corax) {
 )";
     expected_image = expected_image.substr(1); // remove first newline
 
-    launch_rom("../../tests/data/3-corax+.ch8", expected_image, 500, 10000);
+    launch_rom("tests/data/3-corax+.ch8", expected_image, 500, 10000);
 }
 
 TEST(RomTests, Flags) {
@@ -263,7 +263,7 @@ TEST(RomTests, Flags) {
 )";
     expected_image = expected_image.substr(1); // remove first newline
 
-    launch_rom("../../tests/data/4-flags.ch8", expected_image, 1000, 10000);
+    launch_rom("tests/data/4-flags.ch8", expected_image, 1000, 10000);
 }
 
 TEST(RomTests, Quirks) {
@@ -303,7 +303,7 @@ TEST(RomTests, Quirks) {
 )";
     expected_image = expected_image.substr(1); // remove first newline
 
-    auto rom_bytes = load_rom("../../tests/data/5-quirks.ch8");
+    auto rom_bytes = load_rom("tests/data/5-quirks.ch8");
 
     env_t env({
         .emulator_type = chip8::vm_t::settings_t::CHIP_8,
