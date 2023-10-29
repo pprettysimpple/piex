@@ -43,10 +43,14 @@ int main(int argc, char** argv)
         return buffer;
     });
 
+    auto keyboard_system = std::make_unique<chip8::keyboard_system_fake_t>();
+    auto timers_system = std::make_unique<chip8::timers_system_basic_t>();
+    auto video_system = std::make_unique<chip8::video_system_ascii_t>();
+
     auto vm = std::make_unique<chip8::vm_t>(
-        std::make_unique<chip8::keyboard_system_fake_t>(),
-        std::make_unique<chip8::timers_system_basic_t>(),
-        std::make_unique<chip8::video_system_ascii_t>()
+        *keyboard_system,
+        *timers_system,
+        *video_system
     );
 
     vm->load_data(rom, chip8::ROM_OFFSET);

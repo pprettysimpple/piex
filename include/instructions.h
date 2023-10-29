@@ -18,7 +18,7 @@ namespace instructions {
 inline constexpr auto CLS = vm_t::instruction_t{
     "CLS",
     [](vm_t& vm, const vm_t::opcode_t&) {
-        vm.video_system->clear_screen();
+        vm.video_system.clear_screen();
         vm.next_instruction();
     }
 };
@@ -259,7 +259,7 @@ inline constexpr auto DRW_VX_VY_N = vm_t::instruction_t{
 
         const auto sprite = bytes_view(vm.memory.begin() + vm.I, opcode.get_n());
 
-        vm.V[0xF] = vm.video_system->draw_sprite(
+        vm.V[0xF] = vm.video_system.draw_sprite(
             vm.V[opcode.get_x()] % VIDEO_WIDTH,
             vm.V[opcode.get_y()] % VIDEO_HEIGHT,
             sprite
@@ -272,7 +272,7 @@ inline constexpr auto DRW_VX_VY_N = vm_t::instruction_t{
 inline constexpr auto SKP_VX = vm_t::instruction_t{
     "SKP_VX",
     [](vm_t& vm, const vm_t::opcode_t& opcode) {
-        if (vm.keyboard_system->is_pressed(static_cast<keyboard_key_t>(vm.V[opcode.get_x()]))){
+        if (vm.keyboard_system.is_pressed(static_cast<keyboard_key_t>(vm.V[opcode.get_x()]))){
             vm.next_instruction(); // skip next instruction
         }
         vm.next_instruction();
@@ -282,7 +282,7 @@ inline constexpr auto SKP_VX = vm_t::instruction_t{
 inline constexpr auto SKNP_VX = vm_t::instruction_t{
     "SKNP_VX",
     [](vm_t& vm, const vm_t::opcode_t& opcode) {
-        if (!vm.keyboard_system->is_pressed(static_cast<keyboard_key_t>(vm.V[opcode.get_x()]))) {
+        if (!vm.keyboard_system.is_pressed(static_cast<keyboard_key_t>(vm.V[opcode.get_x()]))) {
             vm.next_instruction(); // skip next instruction
         }
         vm.next_instruction();
@@ -292,7 +292,7 @@ inline constexpr auto SKNP_VX = vm_t::instruction_t{
 inline constexpr auto LD_VX_DT = vm_t::instruction_t{
     "LD_VX_DT",
     [](vm_t& vm, const vm_t::opcode_t& opcode) {
-        vm.V[opcode.get_x()] = vm.timers_system->get_delay_timer();
+        vm.V[opcode.get_x()] = vm.timers_system.get_delay_timer();
         vm.next_instruction();
     }
 };
@@ -300,7 +300,7 @@ inline constexpr auto LD_VX_DT = vm_t::instruction_t{
 inline constexpr auto LD_VX_K = vm_t::instruction_t{
     "LD_VX_K",
     [](vm_t& vm, const vm_t::opcode_t& opcode) {
-        vm.V[opcode.get_x()] = static_cast<uint8_t>(vm.keyboard_system->wait_for_keypress());
+        vm.V[opcode.get_x()] = static_cast<uint8_t>(vm.keyboard_system.wait_for_keypress());
         vm.next_instruction();
     }
 };
@@ -308,7 +308,7 @@ inline constexpr auto LD_VX_K = vm_t::instruction_t{
 inline constexpr auto LD_DT_VX = vm_t::instruction_t{
     "LD_DT_VX",
     [](vm_t& vm, const vm_t::opcode_t& opcode) {
-        vm.timers_system->set_delay_timer(vm.V[opcode.get_x()]);
+        vm.timers_system.set_delay_timer(vm.V[opcode.get_x()]);
         vm.next_instruction();
     }
 };

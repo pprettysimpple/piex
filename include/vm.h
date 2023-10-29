@@ -72,15 +72,15 @@ struct vm_t {
     std::array<uint8_t, MEMORY_SIZE> memory;
 
     // peripherals
-    keyboard_system_ptr keyboard_system;
-    timers_system_ptr timers_system;
-    video_system_ptr video_system;
+    keyboard_system_iface_t& keyboard_system;
+    timers_system_iface_t& timers_system;
+    video_system_iface_t& video_system;
 
 
     explicit vm_t(
-        keyboard_system_ptr&& keyboard_system,
-        timers_system_ptr&& timers_system,
-        video_system_ptr&& video_system
+        keyboard_system_iface_t& keyboard_system,
+        timers_system_iface_t& timers_system,
+        video_system_iface_t& video_system
     ) noexcept;
 
     vm_t(const vm_t&) = delete;

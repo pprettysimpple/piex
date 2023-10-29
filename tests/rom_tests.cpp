@@ -16,11 +16,11 @@
 
 
 struct keyboard_mock_t : chip8::keyboard_system_iface_t {
-    bool is_pressed(chip8::keyboard_key_t key) const noexcept override {
+    bool is_pressed(chip8::keyboard_key_t key) override {
         return pressed_keys[static_cast<size_t>(key)];
     }
 
-    chip8::keyboard_key_t wait_for_keypress() const noexcept override {
+    chip8::keyboard_key_t wait_for_keypress() override {
         return chip8::keyboard_key_t::KEY_0; // FIXME: implement
     }
 
@@ -47,22 +47,28 @@ struct video_system_mock_t : chip8::video_system_none_t {
 };
 
 struct env_t {
+    std::unique_ptr<keyboard_mock_t> keyboard_system = std::make_unique<keyboard_mock_t>();
+    std::unique_ptr<chip8::timers_system_basic_t> timers_system = std::make_unique<chip8::timers_system_basic_t>();
+    std::unique_ptr<video_system_mock_t> video_system = std::make_unique<video_system_mock_t>();
+
     chip8::vm_t vm;
 
-    env_t() :
-        vm(std::make_unique<keyboard_mock_t>(),
-           std::make_unique<chip8::timers_system_basic_t>(),
-           std::make_unique<video_system_mock_t>())
+    env_t() 
+        : vm(
+            *keyboard_system,
+            *timers_system,
+            *video_system
+        )
     {
         vm.load_data(chip8::CHIP8_STANDARD_FONTSET_VIEW, 0);
     }
 
     video_system_mock_t& get_video_system() noexcept {
-        return *static_cast<video_system_mock_t*>(vm.video_system.get());
+        return *video_system;
     }
 
     keyboard_mock_t& get_keyboard() noexcept {
-        return *static_cast<keyboard_mock_t*>(vm.keyboard_system.get());
+        return *keyboard_system;
     }
 };
 

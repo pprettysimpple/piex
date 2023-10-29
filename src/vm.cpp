@@ -10,22 +10,25 @@
 
 #include <common.h>
 #include <instructions.h>
+#include <platform_iface/keyboard.h>
+#include <platform_iface/timers.h>
+#include <platform_iface/video.h>
 #include <vm.h>
 
 
 namespace chip8 {
 
 vm_t::vm_t(
-    keyboard_system_ptr&& keyboard_system,
-    timers_system_ptr&& timers_system,
-    video_system_ptr&& video_system
+    keyboard_system_iface_t& keyboard_system,
+    timers_system_iface_t& timers_system,
+    video_system_iface_t& video_system
 ) noexcept
     : I(0)
     , pc(ROM_OFFSET)
     , sp(0)
-    , keyboard_system(std::move(keyboard_system))
-    , timers_system(std::move(timers_system))
-    , video_system(std::move(video_system))
+    , keyboard_system(keyboard_system)
+    , timers_system(timers_system)
+    , video_system(video_system)
 {
     std::fill(memory.begin(), memory.end(), 0);
     std::fill(V.begin(), V.end(), 0);
