@@ -336,7 +336,8 @@ inline constexpr auto ADD_I_VX = vm_t::instruction_t{
 inline constexpr auto LD_F_VX = vm_t::instruction_t{
     "LD_F_VX",
     [](vm_t& vm, const opcode_t& opcode) {
-        assert(false && "LD_F_VX not implemented");
+        // TODO: make setting for this quirk
+        vm.I = vm.V[opcode.get_x()] * 5;
         vm.next_instruction();
     }
 };
