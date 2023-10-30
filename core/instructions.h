@@ -296,7 +296,7 @@ inline constexpr auto SKNP_VX = vm_t::instruction_t{
 inline constexpr auto LD_VX_DT = vm_t::instruction_t{
     "LD_VX_DT",
     [](vm_t& vm, const opcode_t& opcode) {
-        vm.V[opcode.get_x()] = vm.timers_system.get_delay_timer();
+        vm.V[opcode.get_x()] = vm.delay_timer;
         vm.next_instruction();
     }
 };
@@ -312,7 +312,7 @@ inline constexpr auto LD_VX_K = vm_t::instruction_t{
 inline constexpr auto LD_DT_VX = vm_t::instruction_t{
     "LD_DT_VX",
     [](vm_t& vm, const opcode_t& opcode) {
-        vm.timers_system.set_delay_timer(vm.V[opcode.get_x()]);
+        vm.delay_timer = vm.V[opcode.get_x()];
         vm.next_instruction();
     }
 };
@@ -320,7 +320,7 @@ inline constexpr auto LD_DT_VX = vm_t::instruction_t{
 inline constexpr auto LD_ST_VX = vm_t::instruction_t{
     "LD_ST_VX",
     [](vm_t& vm, const opcode_t& opcode) {
-        vm.timers_system.set_sound_timer(vm.V[opcode.get_x()]);
+        vm.sound_timer = vm.V[opcode.get_x()];
         vm.next_instruction();
     }
 };

@@ -51,6 +51,8 @@ struct vm_t {
     uint16_t I;
     uint16_t pc;
     uint8_t sp;
+    uint8_t delay_timer;
+    uint8_t sound_timer;
 
     // memory
     std::array<uint16_t, STACK_SIZE> stack;

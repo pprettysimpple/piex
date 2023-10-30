@@ -58,18 +58,23 @@ void vm_t::emulate_one_instruction() {
     execute_instruction_decoded({instruction, opcode});
 
     sum_exec_duration_mod_timer += OP_DURATION;
-
-    while (sum_exec_duration_mod_timer >= TIMER_DURATION) {
-        timers_system.tick();
-        sum_exec_duration_mod_timer -= TIMER_DURATION;
-    }
 }
 
 void vm_t::emulate_duration(std::chrono::nanoseconds target_duration) {
     auto accumulated_duration = std::chrono::nanoseconds::zero();
     while (accumulated_duration < target_duration) {
+        auto start_sum_duration = sum_exec_duration_mod_timer;
         emulate_one_instruction();
-        accumulated_duration += OP_DURATION;
+        auto elapsed = sum_exec_duration_mod_timer - start_sum_duration;
+        
+        accumulated_duration += elapsed;
+        while (sum_exec_duration_mod_timer >= TIMER_DURATION) {
+            sum_exec_duration_mod_timer -= TIMER_DURATION;
+
+            delay_timer = std::max(0, delay_timer - 1);
+            sound_timer = std::max(0, sound_timer - 1);
+            timers_system.tick(TIMER_DURATION);
+        }
     }
 }
 

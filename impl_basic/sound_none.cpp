@@ -1,4 +1,4 @@
-#include "timers_basic.h"
+#include "sound_none.h"
 
 #include <iostream>
 #include <sstream>
@@ -9,7 +9,7 @@
 
 namespace chip8 {
 
-void timers_system_basic_t::tick(std::chrono::nanoseconds duration) {
+void sound_system_none_t::play_sound(std::chrono::nanoseconds duration) {
     std::this_thread::sleep_for(duration);
 }
 
