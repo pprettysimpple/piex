@@ -13,6 +13,7 @@
 #include <core/common.h>
 #include <core/iface/keyboard.h>
 #include <core/iface/random.h>
+#include <core/iface/sound.h>
 #include <core/iface/timers.h>
 #include <core/iface/video.h>
 
@@ -63,6 +64,7 @@ struct vm_t {
     timers_system_iface_t& timers_system;
     video_system_iface_t& video_system;
     random_system_iface_t& random_system;
+    sound_system_iface_t& sound_system;
 
     std::chrono::nanoseconds sum_exec_duration_mod_timer = std::chrono::nanoseconds::zero();
 
@@ -71,7 +73,8 @@ struct vm_t {
         keyboard_system_iface_t& keyboard_system,
         timers_system_iface_t& timers_system,
         video_system_iface_t& video_system,
-        random_system_iface_t& random_system
+        random_system_iface_t& random_system,
+        sound_system_iface_t& sound_system
     ) noexcept;
 
     vm_t(const vm_t&) = delete;

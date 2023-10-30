@@ -24,7 +24,8 @@ vm_t::vm_t(
     keyboard_system_iface_t& keyboard_system,
     timers_system_iface_t& timers_system,
     video_system_iface_t& video_system,
-    random_system_iface_t& random_system
+    random_system_iface_t& random_system,
+    sound_system_iface_t& sound_system
 ) noexcept
     : settings(std::move(settings))
     , I(0)
@@ -34,6 +35,7 @@ vm_t::vm_t(
     , timers_system(timers_system)
     , video_system(video_system)
     , random_system(random_system)
+    , sound_system(sound_system)
 {
     std::fill(memory.begin(), memory.end(), 0);
     std::fill(V.begin(), V.end(), 0);
@@ -68,13 +70,18 @@ void vm_t::emulate_duration(std::chrono::nanoseconds target_duration) {
         auto elapsed = sum_exec_duration_mod_timer - start_sum_duration;
         
         accumulated_duration += elapsed;
+
+        auto play_sound_duration = std::chrono::nanoseconds::zero();
         while (sum_exec_duration_mod_timer >= TIMER_DURATION) {
             sum_exec_duration_mod_timer -= TIMER_DURATION;
+            play_sound_duration += TIMER_DURATION;
 
             delay_timer = std::max(0, delay_timer - 1);
             sound_timer = std::max(0, sound_timer - 1);
             timers_system.tick(TIMER_DURATION);
         }
+
+        sound_system.play_sound(play_sound_duration);
     }
 }
 

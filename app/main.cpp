@@ -8,6 +8,7 @@
 #include <impl_basic/keyboard_fake.h>
 #include <impl_basic/timers_basic.h>
 #include <impl_basic/video_ascii.h>
+#include <impl_basic/sound_none.h>
 
 #include <impl_sdl/platform.h>
 
@@ -44,6 +45,7 @@ int main(int argc, char** argv)
             *sdl_impl,
             *sdl_impl,
             *sdl_impl,
+            *sdl_impl,
             *sdl_impl
         );
 
@@ -58,13 +60,15 @@ int main(int argc, char** argv)
         auto timers_system = std::make_unique<chip8::timers_system_basic_t>();
         auto video_system = std::make_unique<chip8::video_system_ascii_t>();
         auto random_system = std::make_unique<chip8::random_system_crand_t>();
+        auto sound_system = std::make_unique<chip8::sound_system_none_t>();
 
         auto vm = std::make_unique<chip8::vm_t>(
             std::move(settings),
             *keyboard_system,
             *timers_system,
             *video_system,
-            *random_system
+            *random_system,
+            *sound_system
         );
 
         vm->load_data(rom, chip8::ROM_OFFSET);
