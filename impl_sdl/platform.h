@@ -20,7 +20,7 @@ struct sdl_system_facade_t : video_system_abstract_t,
                              keyboard_system_iface_t,
                              timers_system_basic_t,
                              random_system_crand_t {
-    static inline constexpr int PIXEL_SIZE = 8;
+    static inline constexpr int PIXEL_SIZE = 16;
 
     // keymap
     // 1 2 3 4
