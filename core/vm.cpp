@@ -53,8 +53,6 @@ void vm_t::emulate_one_instruction() {
 
     const auto& instruction = instruction_opt.value().get();
 
-    std::printf("dt: %d\n", timers_system.get_delay_timer());
-
     execute_instruction_decoded({instruction, opcode});
 
     sum_exec_duration_mod_timer += OP_DURATION;
