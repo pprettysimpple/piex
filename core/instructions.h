@@ -320,7 +320,7 @@ inline constexpr auto LD_DT_VX = vm_t::instruction_t{
 inline constexpr auto LD_ST_VX = vm_t::instruction_t{
     "LD_ST_VX",
     [](vm_t& vm, const opcode_t& opcode) {
-        assert(false && "LD_ST_VX not implemented");
+        vm.timers_system.set_sound_timer(vm.V[opcode.get_x()]);
         vm.next_instruction();
     }
 };
