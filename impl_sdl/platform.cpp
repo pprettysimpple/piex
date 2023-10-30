@@ -1,8 +1,13 @@
 #include "platform.h"
 
 #include <SDL2/SDL_events.h>
+
 #include <iostream>
+#include <optional>
 #include <sstream>
+
+#include <core/common.h>
+
 
 namespace chip8::sdl {
 
@@ -69,28 +74,49 @@ bool sdl_system_facade_t::is_pressed(keyboard_key_t key) {
 }
 
 keyboard_key_t sdl_system_facade_t::wait_for_keypress() {
-    while (true) {
-        const uint8_t* state = SDL_GetKeyboardState(nullptr);
+    last_key_pressed.store(std::nullopt);
+    last_key_pressed.wait(std::nullopt);
 
-        for (uint8_t i = 0; i < 16; ++i) {
-            auto key = static_cast<keyboard_key_t>(i);
-            auto sdl_key_code = chip8_key_to_sdl_key(key);
-            if (state[SDL_GetScancodeFromKey(sdl_key_code)]) {
-                return key;
-            }
-        }
-    }
+    auto key = last_key_pressed.load().value();
+
+    key_pressed[key].wait(true);
+    return static_cast<keyboard_key_t>(key);
 }
 
 void sdl_system_facade_t::ui_thread_func() {
     SDL_Event e;
     while (true) {
         while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT) {
-                std::exit(EXIT_SUCCESS);
-            }
-            if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE) {
-                std::exit(EXIT_SUCCESS);
+            switch (e.type) {
+                case SDL_QUIT:
+                    std::exit(EXIT_SUCCESS);
+                    break;
+                case SDL_KEYDOWN: {
+                    if (e.key.keysym.sym == SDLK_ESCAPE) {
+                        std::exit(EXIT_SUCCESS);
+                    }
+                    auto key_opt = sdl_key_to_chip8_key(e.key.keysym.sym);
+                    if (key_opt.has_value()) {
+                        auto key = key_opt.value();
+                        key_pressed[key].store(true);
+                        key_pressed[key].notify_one();
+
+                        last_key_pressed.store(key);
+                        last_key_pressed.notify_one();
+                    }
+                    break;
+                }
+                case SDL_KEYUP: {
+                    auto key_opt = sdl_key_to_chip8_key(e.key.keysym.sym);
+                    if (key_opt.has_value()) {
+                        auto key = key_opt.value();
+                        key_pressed[key].store(false);
+                        key_pressed[key].notify_one();
+                    }
+                    break;
+                }
+                default:
+                    continue;
             }
         }
     }

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
 #include <optional>
 #include <thread>
 
@@ -99,6 +102,8 @@ struct sdl_system_facade_t : video_system_abstract_t,
 
     std::thread ui_thread;
 
+    std::array<std::atomic<bool>, KEYPAD_SIZE> key_pressed;
+    std::atomic<std::optional<keyboard_key_t>> last_key_pressed;
 };
 
 } // namespace chip8::sdl
