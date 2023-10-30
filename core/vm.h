@@ -21,39 +21,31 @@
 namespace chip8 {
 
 struct vm_t {
-    static inline constexpr auto OP_DURATION = std::chrono::milliseconds(2);
-    static inline constexpr auto TIMER_DURATION = std::chrono::nanoseconds(16666667);
+    static inline constexpr auto DEFAULT_OP_DURATION = std::chrono::milliseconds(2);
+    static inline constexpr auto DEFAULT_TIMER_DURATION = std::chrono::nanoseconds(16666667);
 
     struct settings_t {
         enum emulator_type_t {
             CHIP_8,
             SCHIP1_1,
-            SCHIP_C,
             XO_CHIP,
         };
 
         emulator_type_t emulator_type = CHIP_8;
+        std::chrono::nanoseconds timer_duration = DEFAULT_TIMER_DURATION;
+        std::chrono::nanoseconds op_duration = DEFAULT_OP_DURATION;
     };
-
-    struct instruction_t {
-        std::string_view name;
-
-        using executor_t = void (*)(vm_t&, const opcode_t&);
-        const executor_t executor;
-    };
-
-    using decoded_instruction_t = std::tuple<std::reference_wrapper<const vm_t::instruction_t>, opcode_t>;
 
     // settings
     settings_t settings;
 
     // registers
     std::array<uint8_t, REGISTERS_SIZE> V;
-    uint16_t I;
-    uint16_t pc;
-    uint8_t sp;
-    uint8_t delay_timer;
-    uint8_t sound_timer;
+    uint16_t I = 0;
+    uint16_t pc = ROM_OFFSET;
+    uint8_t sp = 0;
+    uint8_t delay_timer = 0;
+    uint8_t sound_timer = 0;
 
     // memory
     std::array<uint16_t, STACK_SIZE> stack;
@@ -89,11 +81,6 @@ struct vm_t {
     void load_data(const bytes_view data, const size_t offset) noexcept;
 
     void next_instruction() noexcept;
-
-    std::optional<std::reference_wrapper<const vm_t::instruction_t>> decode_instruction(const opcode_t& opcode_bytes) const;
-
-    decoded_instruction_t execute_instruction_pc();
-    void execute_instruction_decoded(const decoded_instruction_t& decoded_instruction);
 };
 
 } // namespace chip8

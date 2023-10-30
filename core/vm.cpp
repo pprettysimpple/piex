@@ -14,10 +14,39 @@
 #include <core/iface/timers.h>
 #include <core/iface/video.h>
 #include <core/instructions.h>
+#include <core/instruction_decoder.h>
 #include <core/vm.h>
 
 
 namespace chip8 {
+
+namespace {
+
+void wrap_instruction_execution(vm_t& vm, const decoded_instruction_t& decoded_instruction) {
+    const auto& [instruction_ref, opcode] = decoded_instruction;
+    try {
+        instruction_ref.get().executor(vm, opcode);
+    } catch (const std::exception& e) {
+        std::stringstream error;
+        error << "error while executing instruction: " << instruction_ref.get().name << std::endl;
+        error << "error: " << e.what();
+        
+        error << "debug info:" << std::endl;
+        error << "sp: 0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint16_t>(vm.sp) << std::endl;
+        error << "pc: 0x" << std::hex << std::setw(4) << std::setfill('0') << vm.pc << std::endl;
+        error << "opcode: 0x" << std::hex << std::setw(4) << std::setfill('0') << opcode.bytes << std::endl;
+        error << "I: 0x" << std::hex << std::setw(4) << std::setfill('0') << vm.I << std::endl;
+        error << "V: ";
+        for (const auto& v : vm.V) {
+            error << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint16_t>(v) << " ";
+        }
+        error << std::endl;
+        throw;
+    }
+}
+
+}
+
 
 vm_t::vm_t(
     settings_t&& settings,
@@ -28,9 +57,6 @@ vm_t::vm_t(
     sound_system_iface_t& sound_system
 ) noexcept
     : settings(std::move(settings))
-    , I(0)
-    , pc(ROM_OFFSET)
-    , sp(0)
     , keyboard_system(keyboard_system)
     , timers_system(timers_system)
     , video_system(video_system)
@@ -57,9 +83,9 @@ void vm_t::emulate_one_instruction() {
 
     const auto& instruction = instruction_opt.value().get();
 
-    execute_instruction_decoded({instruction, opcode});
+    wrap_instruction_execution(*this, {instruction, opcode});
 
-    sum_exec_duration_mod_timer += OP_DURATION;
+    sum_exec_duration_mod_timer += settings.op_duration;
 }
 
 void vm_t::emulate_duration(std::chrono::nanoseconds target_duration) {
@@ -72,13 +98,13 @@ void vm_t::emulate_duration(std::chrono::nanoseconds target_duration) {
         accumulated_duration += elapsed;
 
         auto play_sound_duration = std::chrono::nanoseconds::zero();
-        while (sum_exec_duration_mod_timer >= TIMER_DURATION) {
-            sum_exec_duration_mod_timer -= TIMER_DURATION;
-            play_sound_duration += TIMER_DURATION;
+        while (sum_exec_duration_mod_timer >= settings.timer_duration) {
+            sum_exec_duration_mod_timer -= settings.timer_duration;
+            play_sound_duration += settings.timer_duration;
 
             delay_timer = std::max(0, delay_timer - 1);
             sound_timer = std::max(0, sound_timer - 1);
-            timers_system.tick(TIMER_DURATION);
+            timers_system.tick(settings.timer_duration);
         }
 
         sound_system.play_sound(play_sound_duration);
@@ -89,170 +115,9 @@ void vm_t::load_data(const bytes_view data, const size_t offset) noexcept {
     std::copy(data.begin(), data.end(), memory.begin() + offset);
 }
 
-std::optional<std::reference_wrapper<const vm_t::instruction_t>> vm_t::decode_instruction(const opcode_t& opcode) const {
-    switch (opcode.get_nibble<3>()) {
-        case 0x0: {
-            switch (opcode.get_kk()) {
-                case 0xE0: {
-                    return std::cref(instructions::CLS);
-                }
-                case 0xEE: {
-                    return std::cref(instructions::RET);
-                }
-                default: {
-                    return std::nullopt;
-                }
-            }
-        }
-        case 0x1: {
-            return std::cref(instructions::JP_ADDR);
-        }
-        case 0x2: {
-            return std::cref(instructions::CALL_ADDR);
-        }
-        case 0x3: {
-            return std::cref(instructions::SE_VX_BYTE);
-        }
-        case 0x4: {
-            return std::cref(instructions::SNE_VX_BYTE);
-        }
-        case 0x5: {
-            return std::cref(instructions::SE_VX_VY);
-        }
-        case 0x6: {
-            return std::cref(instructions::LD_VX_BYTE);
-        }
-        case 0x7: {
-            return std::cref(instructions::ADD_VX_BYTE);
-        }
-        case 0x8: {
-            switch (opcode.get_nibble<0>()) {
-                case 0x0: {
-                    return std::cref(instructions::LD_VX_VY);
-                }
-                case 0x1: {
-                    return std::cref(instructions::OR_VX_VY);
-                }
-                case 0x2: {
-                    return std::cref(instructions::AND_VX_VY);
-                }
-                case 0x3: {
-                    return std::cref(instructions::XOR_VX_VY);
-                }
-                case 0x4: {
-                    return std::cref(instructions::ADD_VX_VY);
-                }
-                case 0x5: {
-                    return std::cref(instructions::SUB_VX_VY);
-                }
-                case 0x6: {
-                    return std::cref(instructions::SHR_VX_VY);
-                }
-                case 0x7: {
-                    return std::cref(instructions::SUBN_VX_VY);
-                }
-                case 0xE: {
-                    return std::cref(instructions::SHL_VX_VY);
-                }
-                default: {
-                    return std::nullopt;
-                }
-            }
-        }
-        case 0x9: {
-            return std::cref(instructions::SNE_VX_VY);
-        }
-        case 0xA: {
-            return std::cref(instructions::LD_I_ADDR);
-        }
-        case 0xB: {
-            return std::cref(instructions::JP_V0_ADDR);
-        }
-        case 0xC: {
-            return std::cref(instructions::RND_VX_BYTE);
-        }
-        case 0xD: {
-            return std::cref(instructions::DRW_VX_VY_N);
-        }
-        case 0xE: {
-            switch (opcode.get_kk()) {
-                case 0x9E: {
-                    return std::cref(instructions::SKP_VX);
-                }
-                case 0xA1: {
-                    return std::cref(instructions::SKNP_VX);
-                }
-                default: {
-                    return std::nullopt;
-                }
-            }
-        }
-        case 0xF: {
-            switch (opcode.get_kk()) {
-                case 0x07: {
-                    return std::cref(instructions::LD_VX_DT);
-                }
-                case 0x0A: {
-                    return std::cref(instructions::LD_VX_K);
-                }
-                case 0x15: {
-                    return std::cref(instructions::LD_DT_VX);
-                }
-                case 0x18: {
-                    return std::cref(instructions::LD_ST_VX);
-                }
-                case 0x1E: {
-                    return std::cref(instructions::ADD_I_VX);
-                }
-                case 0x29: {
-                    return std::cref(instructions::LD_F_VX);
-                }
-                case 0x33: {
-                    return std::cref(instructions::LD_B_VX);
-                }
-                case 0x55: {
-                    return std::cref(instructions::LD_I_VX);
-                }
-                case 0x65: {
-                    return std::cref(instructions::LD_VX_I);
-                }
-                default: {
-                    return std::nullopt;
-                }
-            }
-        }
-        default: {
-            return std::nullopt;
-        }
-    }
-}
-
 void vm_t::next_instruction() noexcept {
     pc += 2;
     pc %= MEMORY_SIZE;
-}
-
-void vm_t::execute_instruction_decoded(const decoded_instruction_t& decoded_instruction) {
-    const auto& [instruction_ref, opcode] = decoded_instruction;
-    try {
-        instruction_ref.get().executor(*this, opcode);
-    } catch (const std::exception& e) {
-        std::stringstream error;
-        error << "error while executing instruction: " << instruction_ref.get().name << std::endl;
-        error << "error: " << e.what();
-        
-        error << "debug info:" << std::endl;
-        error << "sp: 0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint16_t>(sp) << std::endl;
-        error << "pc: 0x" << std::hex << std::setw(4) << std::setfill('0') << pc << std::endl;
-        error << "opcode: 0x" << std::hex << std::setw(4) << std::setfill('0') << opcode.bytes << std::endl;
-        error << "I: 0x" << std::hex << std::setw(4) << std::setfill('0') << I << std::endl;
-        error << "V: ";
-        for (const auto& v : V) {
-            error << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint16_t>(v) << " ";
-        }
-        error << std::endl;
-        throw;
-    }
 }
 
 } // namespace chip8

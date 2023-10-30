@@ -14,9 +14,18 @@
 
 namespace chip8 {
 
+struct instruction_t {
+        std::string_view name;
+
+        using executor_t = void (*)(vm_t&, const opcode_t&);
+        const executor_t executor;
+    };
+
+using decoded_instruction_t = std::tuple<std::reference_wrapper<const instruction_t>, opcode_t>;
+
 namespace instructions {
 
-inline constexpr auto CLS = vm_t::instruction_t{
+inline constexpr auto CLS = instruction_t{
     "CLS",
     [](vm_t& vm, const opcode_t&) {
         vm.video_system.clear_screen();
@@ -24,7 +33,7 @@ inline constexpr auto CLS = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto RET = vm_t::instruction_t{
+inline constexpr auto RET = instruction_t{
     "RET",
     [](vm_t& vm, const opcode_t&) {
         if (vm.sp == 0) {
@@ -35,14 +44,14 @@ inline constexpr auto RET = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto JP_ADDR = vm_t::instruction_t{
+inline constexpr auto JP_ADDR = instruction_t{
     "JP_ADDR",
     [](vm_t& vm, const opcode_t& opcode) {
         vm.pc = opcode.get_nnn();
     }
 };
 
-inline constexpr auto CALL_ADDR = vm_t::instruction_t{
+inline constexpr auto CALL_ADDR = instruction_t{
     "CALL_ADDR",
     [](vm_t& vm, const opcode_t& opcode) {
         if (vm.sp == vm.stack.size()) {
@@ -53,7 +62,7 @@ inline constexpr auto CALL_ADDR = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto SE_VX_BYTE = vm_t::instruction_t{
+inline constexpr auto SE_VX_BYTE = instruction_t{
     "SE_VX_BYTE",
     [](vm_t& vm, const opcode_t& opcode) {
         if (vm.V[opcode.get_x()] == opcode.get_kk()) {
@@ -63,7 +72,7 @@ inline constexpr auto SE_VX_BYTE = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto SNE_VX_BYTE = vm_t::instruction_t{
+inline constexpr auto SNE_VX_BYTE = instruction_t{
     "SNE_VX_BYTE",
     [](vm_t& vm, const opcode_t& opcode) {
         if (vm.V[opcode.get_x()] != opcode.get_kk()) {
@@ -73,7 +82,7 @@ inline constexpr auto SNE_VX_BYTE = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto SE_VX_VY = vm_t::instruction_t{
+inline constexpr auto SE_VX_VY = instruction_t{
     "SE_VX_VY",
     [](vm_t& vm, const opcode_t& opcode) {
         if (vm.V[opcode.get_x()] == vm.V[opcode.get_y()]) {
@@ -83,7 +92,7 @@ inline constexpr auto SE_VX_VY = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto LD_VX_BYTE = vm_t::instruction_t{
+inline constexpr auto LD_VX_BYTE = instruction_t{
     "LD_VX_BYTE",
     [](vm_t& vm, const opcode_t& opcode) {
         vm.V[opcode.get_x()] = opcode.get_kk();
@@ -91,7 +100,7 @@ inline constexpr auto LD_VX_BYTE = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto ADD_VX_BYTE = vm_t::instruction_t{
+inline constexpr auto ADD_VX_BYTE = instruction_t{
     "ADD_VX_BYTE",
     [](vm_t& vm, const opcode_t& opcode) {
         vm.V[opcode.get_x()] += opcode.get_kk();
@@ -99,7 +108,7 @@ inline constexpr auto ADD_VX_BYTE = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto LD_VX_VY = vm_t::instruction_t{
+inline constexpr auto LD_VX_VY = instruction_t{
     "LD_VX_VY",
     [](vm_t& vm, const opcode_t& opcode) {
         vm.V[opcode.get_x()] = vm.V[opcode.get_y()];
@@ -107,7 +116,7 @@ inline constexpr auto LD_VX_VY = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto OR_VX_VY = vm_t::instruction_t{
+inline constexpr auto OR_VX_VY = instruction_t{
     "OR_VX_VY",
     
     [](vm_t& vm, const opcode_t& opcode) {
@@ -121,7 +130,7 @@ inline constexpr auto OR_VX_VY = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto AND_VX_VY = vm_t::instruction_t{
+inline constexpr auto AND_VX_VY = instruction_t{
     "AND_VX_VY",
     [](vm_t& vm, const opcode_t& opcode) {
         vm.V[opcode.get_x()] &= vm.V[opcode.get_y()];
@@ -134,7 +143,7 @@ inline constexpr auto AND_VX_VY = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto XOR_VX_VY = vm_t::instruction_t{
+inline constexpr auto XOR_VX_VY = instruction_t{
     "XOR_VX_VY",
     [](vm_t& vm, const opcode_t& opcode) {
         vm.V[opcode.get_x()] ^= vm.V[opcode.get_y()];
@@ -147,7 +156,7 @@ inline constexpr auto XOR_VX_VY = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto ADD_VX_VY = vm_t::instruction_t{
+inline constexpr auto ADD_VX_VY = instruction_t{
     "ADD_VX_VY",
     [](vm_t& vm, const opcode_t& opcode) {
         // check overflow
@@ -164,7 +173,7 @@ inline constexpr auto ADD_VX_VY = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto SUB_VX_VY = vm_t::instruction_t{
+inline constexpr auto SUB_VX_VY = instruction_t{
     "SUB_VX_VY",
     [](vm_t& vm, const opcode_t& opcode) {
         // check underflow
@@ -181,7 +190,7 @@ inline constexpr auto SUB_VX_VY = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto SHR_VX_VY = vm_t::instruction_t{
+inline constexpr auto SHR_VX_VY = instruction_t{
     "SHR_VX_VY",
     [](vm_t& vm, const opcode_t& opcode) {
         uint8_t value = vm.V[opcode.get_y()];
@@ -192,7 +201,7 @@ inline constexpr auto SHR_VX_VY = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto SUBN_VX_VY = vm_t::instruction_t{
+inline constexpr auto SUBN_VX_VY = instruction_t{
     "SUBN_VX_VY",
     [](vm_t& vm, const opcode_t& opcode) {
         // check underflow
@@ -209,7 +218,7 @@ inline constexpr auto SUBN_VX_VY = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto SHL_VX_VY = vm_t::instruction_t{
+inline constexpr auto SHL_VX_VY = instruction_t{
     "SHL_VX_VY",
     [](vm_t& vm, const opcode_t& opcode) {
         uint8_t value = vm.V[opcode.get_y()];
@@ -220,7 +229,7 @@ inline constexpr auto SHL_VX_VY = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto SNE_VX_VY = vm_t::instruction_t{
+inline constexpr auto SNE_VX_VY = instruction_t{
     "SNE_VX_VY",
     [](vm_t& vm, const opcode_t& opcode) {
         if (vm.V[opcode.get_x()] != vm.V[opcode.get_y()]) {
@@ -230,7 +239,7 @@ inline constexpr auto SNE_VX_VY = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto LD_I_ADDR = vm_t::instruction_t{
+inline constexpr auto LD_I_ADDR = instruction_t{
     "LD_I_ADDR",
     [](vm_t& vm, const opcode_t& opcode) {
         vm.I = opcode.get_nnn();
@@ -238,7 +247,7 @@ inline constexpr auto LD_I_ADDR = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto JP_V0_ADDR = vm_t::instruction_t{
+inline constexpr auto JP_V0_ADDR = instruction_t{
     "JP_V0_ADDR",
     [](vm_t& vm, const opcode_t& opcode) {
         // TODO: make setting for this quirk
@@ -246,7 +255,7 @@ inline constexpr auto JP_V0_ADDR = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto RND_VX_BYTE = vm_t::instruction_t{
+inline constexpr auto RND_VX_BYTE = instruction_t{
     "RND_VX_BYTE",
     [](vm_t& vm, const opcode_t& opcode) {
         vm.V[opcode.get_x()] = vm.random_system.get_random_byte() & opcode.get_kk();
@@ -254,7 +263,7 @@ inline constexpr auto RND_VX_BYTE = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto DRW_VX_VY_N = vm_t::instruction_t{
+inline constexpr auto DRW_VX_VY_N = instruction_t{
     "DRW_VX_VY_N",
     [](vm_t& vm, const opcode_t& opcode) {
         if (opcode.get_n() + vm.I > vm.memory.size()) {
@@ -273,7 +282,7 @@ inline constexpr auto DRW_VX_VY_N = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto SKP_VX = vm_t::instruction_t{
+inline constexpr auto SKP_VX = instruction_t{
     "SKP_VX",
     [](vm_t& vm, const opcode_t& opcode) {
         if (vm.keyboard_system.is_pressed(static_cast<keyboard_key_t>(vm.V[opcode.get_x()]))){
@@ -283,7 +292,7 @@ inline constexpr auto SKP_VX = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto SKNP_VX = vm_t::instruction_t{
+inline constexpr auto SKNP_VX = instruction_t{
     "SKNP_VX",
     [](vm_t& vm, const opcode_t& opcode) {
         if (!vm.keyboard_system.is_pressed(static_cast<keyboard_key_t>(vm.V[opcode.get_x()]))) {
@@ -293,7 +302,7 @@ inline constexpr auto SKNP_VX = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto LD_VX_DT = vm_t::instruction_t{
+inline constexpr auto LD_VX_DT = instruction_t{
     "LD_VX_DT",
     [](vm_t& vm, const opcode_t& opcode) {
         vm.V[opcode.get_x()] = vm.delay_timer;
@@ -301,7 +310,7 @@ inline constexpr auto LD_VX_DT = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto LD_VX_K = vm_t::instruction_t{
+inline constexpr auto LD_VX_K = instruction_t{
     "LD_VX_K",
     [](vm_t& vm, const opcode_t& opcode) {
         vm.V[opcode.get_x()] = static_cast<uint8_t>(vm.keyboard_system.wait_for_keypress());
@@ -309,7 +318,7 @@ inline constexpr auto LD_VX_K = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto LD_DT_VX = vm_t::instruction_t{
+inline constexpr auto LD_DT_VX = instruction_t{
     "LD_DT_VX",
     [](vm_t& vm, const opcode_t& opcode) {
         vm.delay_timer = vm.V[opcode.get_x()];
@@ -317,7 +326,7 @@ inline constexpr auto LD_DT_VX = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto LD_ST_VX = vm_t::instruction_t{
+inline constexpr auto LD_ST_VX = instruction_t{
     "LD_ST_VX",
     [](vm_t& vm, const opcode_t& opcode) {
         vm.sound_timer = vm.V[opcode.get_x()];
@@ -325,7 +334,7 @@ inline constexpr auto LD_ST_VX = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto ADD_I_VX = vm_t::instruction_t{
+inline constexpr auto ADD_I_VX = instruction_t{
     "ADD_I_VX",
     [](vm_t& vm, const opcode_t& opcode) {
         vm.I += vm.V[opcode.get_x()];
@@ -333,7 +342,7 @@ inline constexpr auto ADD_I_VX = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto LD_F_VX = vm_t::instruction_t{
+inline constexpr auto LD_F_VX = instruction_t{
     "LD_F_VX",
     [](vm_t& vm, const opcode_t& opcode) {
         // TODO: make setting for this quirk
@@ -342,7 +351,7 @@ inline constexpr auto LD_F_VX = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto LD_B_VX = vm_t::instruction_t{
+inline constexpr auto LD_B_VX = instruction_t{
     "LD_B_VX",
     [](vm_t& vm, const opcode_t& opcode) {
         uint8_t value = vm.V[opcode.get_x()];
@@ -354,7 +363,7 @@ inline constexpr auto LD_B_VX = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto LD_I_VX = vm_t::instruction_t{
+inline constexpr auto LD_I_VX = instruction_t{
     "LD_I_VX",
     [](vm_t& vm, const opcode_t& opcode) {
         uint8_t size = opcode.get_x();
@@ -370,7 +379,7 @@ inline constexpr auto LD_I_VX = vm_t::instruction_t{
     }
 };
 
-inline constexpr auto LD_VX_I = vm_t::instruction_t{
+inline constexpr auto LD_VX_I = instruction_t{
     "LD_VX_I",
     [](vm_t& vm, const opcode_t& opcode) {
         uint8_t size = opcode.get_x();
