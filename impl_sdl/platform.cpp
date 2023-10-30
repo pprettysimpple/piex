@@ -65,12 +65,7 @@ void sdl_system_facade_t::render_impl() {
 }
 
 bool sdl_system_facade_t::is_pressed(keyboard_key_t key) {
-    const uint8_t* state = SDL_GetKeyboardState(nullptr);
-
-    auto sdl_key_code = chip8_key_to_sdl_key(key);
-    auto sdl_scancode = SDL_GetScancodeFromKey(sdl_key_code);
-
-    return state[sdl_scancode];
+    return key_pressed[key].load();
 }
 
 keyboard_key_t sdl_system_facade_t::wait_for_keypress() {
