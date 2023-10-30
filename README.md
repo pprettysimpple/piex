@@ -43,7 +43,7 @@ This will run emulator with SDL2 or ascii-art system implementation. Depending o
 
 ## TODO
 
-- Add sound
+- Add sound implementation in sdl build
 - Incapsulate quirks logic into core
-- Deal with timers, quirks for original chip-8 still does not work properly
+- Better deal with timers, only "display.wait" left for 100% tests
 - Implement rest of opcodes
