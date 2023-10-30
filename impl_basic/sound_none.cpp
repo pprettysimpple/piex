@@ -9,8 +9,6 @@
 
 namespace chip8 {
 
-void sound_system_none_t::play_sound(std::chrono::nanoseconds duration) {
-    std::this_thread::sleep_for(duration);
-}
+void sound_system_none_t::play_sound(std::chrono::nanoseconds duration) {}
 
 } // namespace chip8
