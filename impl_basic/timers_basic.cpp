@@ -2,6 +2,9 @@
 
 #include <iostream>
 #include <sstream>
+#include <thread>
+
+#include <core/vm.h>
 
 
 namespace chip8 {
@@ -18,15 +21,7 @@ void timers_system_basic_t::set_sound_timer(uint8_t value) {
     sound_timer_ = value;
 }
 
-bool timers_system_basic_t::is_sound_active() {
-    return sound_timer_ > 0;
-}
-
-void timers_system_basic_t::update_timers(uint64_t vm_hz) {
-    if (ticks_++ % (vm_hz / TARGET_HZ) != 0) {
-        return;
-    }
-
+void timers_system_basic_t::tick() {
     if (delay_timer_ > 0) {
         delay_timer_--;
     }
@@ -34,6 +29,8 @@ void timers_system_basic_t::update_timers(uint64_t vm_hz) {
     if (sound_timer_ > 0) {
         sound_timer_--;
     }
+
+    std::this_thread::sleep_for(vm_t::TIMER_DURATION);
 }
 
 

@@ -40,30 +40,36 @@ vm_t::vm_t(
     std::fill(stack.begin(), stack.end(), 0);
 }
 
-void vm_t::emulate_one() {
-    auto pc_copy = pc;
-    const auto& [instruction_ref, opcode] = execute_instruction_pc();
+void vm_t::emulate_one_instruction() {
+    uint16_t opcode_bytes = memory[pc] << 8 | memory[pc + 1];
+    auto opcode = opcode_t{opcode_bytes};
+    auto instruction_opt = decode_instruction(opcode);
 
-    timers_system.update_timers(settings.hz);
+    if (!instruction_opt) {
+        std::stringstream error;
+        error << "unknown opcode: 0x" << std::hex << std::setw(4) << std::setfill('0') << opcode_bytes;
+        throw std::runtime_error(error.str());
+    }
 
-    // std::printf("[addr][name][code] 0x%04X %s 0x%04X\n", pc_copy, instruction_ref.get().name.data(), opcode.bytes);
+    const auto& instruction = instruction_opt.value().get();
+
+    std::printf("dt: %d\n", timers_system.get_delay_timer());
+
+    execute_instruction_decoded({instruction, opcode});
+
+    sum_exec_duration_mod_timer += OP_DURATION;
+
+    while (sum_exec_duration_mod_timer >= TIMER_DURATION) {
+        timers_system.tick();
+        sum_exec_duration_mod_timer -= TIMER_DURATION;
+    }
 }
 
-void vm_t::emulate() {
-    auto target_duration = std::chrono::nanoseconds(1'000'000'000 / settings.hz);
-
-    while (settings.max_cycles-- > 0) {
-        auto start_exec_timestamp = std::chrono::high_resolution_clock::now();
-
-        emulate_one();
-
-        // system timers
-        auto end_exec_timestamp = std::chrono::high_resolution_clock::now();
-        auto exec_duration = end_exec_timestamp - start_exec_timestamp;
-
-        auto extra_sleep_duration = target_duration - exec_duration;
-
-        std::this_thread::sleep_for(extra_sleep_duration);
+void vm_t::emulate_duration(std::chrono::nanoseconds target_duration) {
+    auto accumulated_duration = std::chrono::nanoseconds::zero();
+    while (accumulated_duration < target_duration) {
+        emulate_one_instruction();
+        accumulated_duration += OP_DURATION;
     }
 }
 
@@ -71,7 +77,7 @@ void vm_t::load_data(const bytes_view data, const size_t offset) noexcept {
     std::copy(data.begin(), data.end(), memory.begin() + offset);
 }
 
-std::optional<std::reference_wrapper<const vm_t::instruction_t>> vm_t::decode_instruction(const vm_t::opcode_t& opcode) const {
+std::optional<std::reference_wrapper<const vm_t::instruction_t>> vm_t::decode_instruction(const opcode_t& opcode) const {
     switch (opcode.get_nibble<3>()) {
         case 0x0: {
             switch (opcode.get_kk()) {
@@ -212,24 +218,6 @@ std::optional<std::reference_wrapper<const vm_t::instruction_t>> vm_t::decode_in
 void vm_t::next_instruction() noexcept {
     pc += 2;
     pc %= MEMORY_SIZE;
-}
-
-std::tuple<std::reference_wrapper<const vm_t::instruction_t>, vm_t::opcode_t> vm_t::execute_instruction_pc() {
-    uint16_t opcode_bytes = memory[pc] << 8 | memory[pc + 1];
-    auto opcode = opcode_t{opcode_bytes};
-    auto instruction_opt = decode_instruction(opcode);
-
-    if (!instruction_opt) {
-        std::stringstream error;
-        error << "unknown opcode: 0x" << std::hex << std::setw(4) << std::setfill('0') << opcode_bytes;
-        throw std::runtime_error(error.str());
-    }
-
-    const auto& instruction = instruction_opt.value().get();
-
-    execute_instruction_decoded({instruction, opcode});
-
-    return {std::cref(instruction), opcode};
 }
 
 void vm_t::execute_instruction_decoded(const decoded_instruction_t& decoded_instruction) {

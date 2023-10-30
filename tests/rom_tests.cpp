@@ -1,3 +1,4 @@
+#include <chrono>
 #include <cstdio>
 #include <filesystem>
 #include <memory>
@@ -92,17 +93,15 @@ chip8::bytes_owned load_rom(std::string_view filename) {
     return buffer;
 }
 
-void launch_rom(std::string_view filename, std::string expected, uint64_t max_cycles, uint64_t hz) {
+void launch_rom(std::string_view filename, std::string expected, std::chrono::nanoseconds duration) {
     auto rom_bytes = load_rom(filename);
 
     env_t env({
         .emulator_type = chip8::vm_t::settings_t::CHIP_8,
-        .hz = hz,
-        .max_cycles = max_cycles,
     });
     env.vm.load_data(rom_bytes, chip8::ROM_OFFSET);
 
-    env.vm.emulate();
+    env.vm.emulate_duration(duration);
 
     auto actual = env.get_video_system().render_for_test();
 
@@ -147,7 +146,7 @@ TEST(RomTests, Chip8Logo) {
 )";
     expected_image = expected_image.substr(1); // remove first newline
 
-    launch_rom("tests/data/1-chip8-logo.ch8", expected_image, 100, 1000);
+    launch_rom("tests/data/1-chip8-logo.ch8", expected_image, std::chrono::milliseconds(100));
 }
 
 TEST(RomTests, IBMLogo) {
@@ -187,7 +186,7 @@ TEST(RomTests, IBMLogo) {
 )";
     expected_image = expected_image.substr(1); // remove first newline
 
-    launch_rom("tests/data/2-ibm-logo.ch8", expected_image, 100, 1000);
+    launch_rom("tests/data/2-ibm-logo.ch8", expected_image, std::chrono::milliseconds(100));
 }
 
 TEST(RomTests, Corax) {
@@ -227,7 +226,7 @@ TEST(RomTests, Corax) {
 )";
     expected_image = expected_image.substr(1); // remove first newline
 
-    launch_rom("tests/data/3-corax+.ch8", expected_image, 500, 10000);
+    launch_rom("tests/data/3-corax+.ch8", expected_image, std::chrono::seconds(1));
 }
 
 TEST(RomTests, Flags) {
@@ -267,7 +266,7 @@ TEST(RomTests, Flags) {
 )";
     expected_image = expected_image.substr(1); // remove first newline
 
-    launch_rom("tests/data/4-flags.ch8", expected_image, 1000, 10000);
+    launch_rom("tests/data/4-flags.ch8", expected_image, std::chrono::seconds(2));
 }
 
 TEST(RomTests, Quirks) {
@@ -311,17 +310,14 @@ TEST(RomTests, Quirks) {
 
     env_t env({
         .emulator_type = chip8::vm_t::settings_t::CHIP_8,
-        .hz = 500,
-        .max_cycles = 500,
     });
     env.vm.load_data(rom_bytes, chip8::ROM_OFFSET);
 
     env.get_keyboard().pressed_keys[chip8::keyboard_key_t::KEY_1] = true;
-    env.vm.emulate();
-    
-    env.vm.settings.max_cycles = 500 * 5 + 250;
+    env.vm.emulate_duration(std::chrono::seconds(1));
+
     env.get_keyboard().pressed_keys[chip8::keyboard_key_t::KEY_1] = false;
-    env.vm.emulate();
+    env.vm.emulate_duration(std::chrono::seconds(5));
 
     auto actual = env.get_video_system().render_for_test();
 

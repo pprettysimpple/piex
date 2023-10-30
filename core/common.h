@@ -62,4 +62,39 @@ enum keyboard_key_t : uint8_t {
     KEY_F = 0xF
 };
 
+struct opcode_t {
+    uint16_t bytes;
+
+    template <size_t Nibble>
+    uint8_t get_nibble() const noexcept {
+        static_assert(Nibble < 4, "Nimble must be in range [0, 3]");
+
+        return (bytes >> (Nibble * 4)) & 0xF;
+    }
+
+    uint8_t get_x() const noexcept {
+        return get_nibble<2>();
+    }
+
+    uint8_t get_y() const noexcept {
+        return get_nibble<1>();
+    }
+
+    uint8_t get_z() const noexcept {
+        return get_nibble<0>();
+    }
+
+    uint8_t get_n() const noexcept {
+        return get_nibble<0>();
+    }
+
+    uint8_t get_kk() const noexcept {
+        return bytes & 0xFF;
+    }
+
+    uint16_t get_nnn() const noexcept {
+        return bytes & 0xFFF;
+    }
+};
+
 } // namespace chip8

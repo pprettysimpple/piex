@@ -34,8 +34,6 @@ int main(int argc, char** argv)
 
     auto settings = chip8::vm_t::settings_t{
         .emulator_type = chip8::vm_t::settings_t::CHIP_8,
-        .hz = 500,
-        .max_cycles = std::numeric_limits<uint64_t>::max(),
     };
 
     auto run_with_sdl = [settings, &rom]() mutable {
@@ -52,7 +50,7 @@ int main(int argc, char** argv)
         vm->load_data(rom, chip8::ROM_OFFSET);
         vm->load_data(chip8::CHIP8_STANDARD_FONTSET_VIEW, 0);
 
-        vm->emulate();
+        vm->emulate_duration();
     };
 
     auto run_with_ascii = [settings, &rom]() mutable {
@@ -72,7 +70,7 @@ int main(int argc, char** argv)
         vm->load_data(rom, chip8::ROM_OFFSET);
         vm->load_data(chip8::CHIP8_STANDARD_FONTSET_VIEW, 0);
 
-        vm->emulate();
+        vm->emulate_duration();
     };
 
     if (std::string_view(argv[1]) == "sdl") {
