@@ -38,6 +38,8 @@ vm_t::vm_t(
     std::fill(memory.begin(), memory.end(), 0);
     std::fill(V.begin(), V.end(), 0);
     std::fill(stack.begin(), stack.end(), 0);
+
+    video_system.clear_screen();
 }
 
 void vm_t::emulate_one_instruction() {
