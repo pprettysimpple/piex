@@ -249,7 +249,7 @@ inline constexpr auto JP_V0_ADDR = vm_t::instruction_t{
 inline constexpr auto RND_VX_BYTE = vm_t::instruction_t{
     "RND_VX_BYTE",
     [](vm_t& vm, const opcode_t& opcode) {
-        assert(false && "RND_VX_BYTE not implemented");
+        vm.V[opcode.get_x()] = vm.random_system.get_random_byte() & opcode.get_kk();
         vm.next_instruction();
     }
 };
