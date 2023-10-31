@@ -250,8 +250,11 @@ inline constexpr auto LD_I_ADDR = instruction_t{
 inline constexpr auto JP_V0_ADDR = instruction_t{
     "JP_V0_ADDR",
     [](vm_t& vm, const opcode_t& opcode) {
-        // TODO: make setting for this quirk
-        vm.pc = opcode.get_nnn() + vm.V[0];
+        if (vm.settings.emulator_type == vm_t::settings_t::emulator_type_t::CHIP_8) {
+            vm.pc = opcode.get_nnn() + vm.V[0];
+        } else {
+            vm.pc = opcode.get_nnn() + vm.V[opcode.get_x()];
+        }
     }
 };
 
