@@ -86,28 +86,24 @@ void vm_t::emulate_one_instruction() {
     wrap_instruction_execution(*this, {instruction, opcode});
 
     timers_duration += settings.op_duration;
+
+    auto play_sound_duration = std::chrono::nanoseconds::zero();
+    while (timers_duration >= settings.timer_duration) {
+        timers_duration -= settings.timer_duration;
+        play_sound_duration += settings.timer_duration;
+
+        delay_timer = delay_timer > 0 ? delay_timer - 1 : 0;
+        sound_timer = sound_timer > 0 ? sound_timer - 1 : 0;
+        timers_system.tick(settings.timer_duration);
+    }
+
+    sound_system.play_sound(play_sound_duration);
 }
 
 void vm_t::emulate_duration(std::chrono::nanoseconds target_duration) {
-    auto emulation_duration = std::chrono::nanoseconds::zero();
-    while (emulation_duration < target_duration) {
-        auto start_timers_duration = timers_duration;
+    while (target_duration >= settings.op_duration) {
+        target_duration -= settings.op_duration;
         emulate_one_instruction();
-        auto elapsed = timers_duration - start_timers_duration;
-
-        emulation_duration += elapsed;
-
-        auto play_sound_duration = std::chrono::nanoseconds::zero();
-        while (timers_duration >= settings.timer_duration) {
-            timers_duration -= settings.timer_duration;
-            play_sound_duration += settings.timer_duration;
-
-            delay_timer = delay_timer > 0 ? delay_timer - 1 : 0;
-            sound_timer = sound_timer > 0 ? sound_timer - 1 : 0;
-            timers_system.tick(settings.timer_duration);
-        }
-
-        sound_system.play_sound(play_sound_duration);
     }
 }
 
