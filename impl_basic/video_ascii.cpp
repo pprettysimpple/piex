@@ -6,11 +6,7 @@
 
 namespace chip8 {
 
-video_system_ascii_t::video_system_ascii_t() {
-    clear_screen();
-}
-
-void video_system_ascii_t::render_impl() {
+void video_system_ascii_t::render(const video_memory_t& video_memory) {
     std::stringstream frame;
     frame << "\033[2J\033[1;1H";
 
@@ -18,7 +14,7 @@ void video_system_ascii_t::render_impl() {
     
     for (size_t i = 0; i < VIDEO_HEIGHT; ++i) {
         for (size_t j = 0; j < VIDEO_WIDTH; ++j) {
-            frame << (memory[i][j] ? '#' : '.');
+            frame << (video_memory[i][j] ? '#' : '.');
         }
         frame << '\n';
     }

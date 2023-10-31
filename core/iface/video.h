@@ -11,11 +11,7 @@ namespace chip8 {
 struct video_system_iface_t {
     virtual ~video_system_iface_t() = default;
 
-    virtual bool draw_sprite(uint8_t x, uint8_t y, const bytes_view sprite) = 0;
-
-    virtual void clear_screen() = 0;
-
-    virtual void render() = 0;
+    virtual void render(const video_memory_t&) = 0;
 };
 
 using video_system_ptr = std::unique_ptr<video_system_iface_t>;

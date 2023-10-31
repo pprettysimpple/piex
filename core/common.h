@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <string_view>
 
@@ -21,6 +22,8 @@ inline constexpr size_t REGISTERS_SIZE = 16;
 inline constexpr size_t KEYBOARD_SIZE = 16;
 
 inline constexpr size_t FONTSET_SIZE = 80;
+
+using video_memory_t = std::array<std::array<bool, VIDEO_WIDTH>, VIDEO_HEIGHT>;
 
 inline constexpr uint8_t CHIP8_STANDARD_FONTSET[FONTSET_SIZE] = {
 	0xF0, 0x90, 0x90, 0x90, 0xF0,		// 0

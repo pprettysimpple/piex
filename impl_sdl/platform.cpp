@@ -37,7 +37,7 @@ sdl_system_facade_t::sdl_system_facade_t() {
     ui_thread = std::thread(&sdl_system_facade_t::ui_thread_func, this);
 }
 
-void sdl_system_facade_t::render_impl() {
+void sdl_system_facade_t::render(const video_memory_t& video_memory) {
     for (size_t i = 0; i < VIDEO_HEIGHT; ++i) {
         for (size_t j = 0; j < VIDEO_WIDTH; ++j) {
             SDL_Rect rect;
@@ -46,7 +46,7 @@ void sdl_system_facade_t::render_impl() {
             rect.w = PIXEL_SIZE;
             rect.h = PIXEL_SIZE;
 
-            if (memory[i][j]) {
+            if (video_memory[i][j]) {
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
             } else {
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

@@ -32,21 +32,17 @@ struct keyboard_mock_t : chip8::keyboard_system_iface_t {
 };
 
 struct video_system_mock_t : chip8::video_system_none_t {
-    std::string render_for_test() {
+    std::string render_for_test(const chip8::video_memory_t& video_memory) {
         std::stringstream frame;
         
         for (size_t i = 0; i < chip8::VIDEO_HEIGHT; ++i) {
             for (size_t j = 0; j < chip8::VIDEO_WIDTH; ++j) {
-                frame << (memory[i][j] ? '#' : '.');
+                frame << (video_memory[i][j] ? '#' : '.');
             }
             frame << '\n';
         }
 
         return frame.str();
-    }
-
-    const memory_t& get_memory() const noexcept {
-        return memory;
     }
 };
 
@@ -70,14 +66,6 @@ struct env_t {
         )
     {
         vm.load_data(chip8::CHIP8_STANDARD_FONTSET_VIEW, 0);
-    }
-
-    video_system_mock_t& get_video_system() noexcept {
-        return *video_system;
-    }
-
-    keyboard_mock_t& get_keyboard() noexcept {
-        return *keyboard_system;
     }
 };
 
@@ -106,7 +94,7 @@ void launch_rom(std::string_view filename, std::string expected, std::chrono::na
 
     env.vm.emulate_duration(duration);
 
-    auto actual = env.get_video_system().render_for_test();
+    auto actual = env.video_system->render_for_test(env.vm.video_memory);
 
     ASSERT_EQ(expected, actual);
 }
@@ -316,13 +304,13 @@ TEST(RomTests, Quirks) {
     });
     env.vm.load_data(rom_bytes, chip8::ROM_OFFSET);
 
-    env.get_keyboard().pressed_keys[chip8::keyboard_key_t::KEY_1] = true;
+    env.keyboard_system->pressed_keys[chip8::keyboard_key_t::KEY_1] = true;
     env.vm.emulate_duration(std::chrono::seconds(1));
 
-    env.get_keyboard().pressed_keys[chip8::keyboard_key_t::KEY_1] = false;
+    env.keyboard_system->pressed_keys[chip8::keyboard_key_t::KEY_1] = false;
     env.vm.emulate_duration(std::chrono::seconds(5));
 
-    auto actual = env.get_video_system().render_for_test();
+    auto actual = env.video_system->render_for_test(env.vm.video_memory);
 
     printf("actual:\n%s\n", actual.data());
 

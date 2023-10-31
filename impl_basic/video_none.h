@@ -2,13 +2,13 @@
 
 #include <core/common.h>
 
-#include <impl_basic/video_abstract.h>
+#include <core/iface/video.h>
 
 
 namespace chip8 {
 
-struct video_system_none_t : video_system_abstract_t {
-    void render_impl() override;
+struct video_system_none_t : video_system_iface_t {
+    void render(const video_memory_t&) override;
 };
 
 } // namespace chip8

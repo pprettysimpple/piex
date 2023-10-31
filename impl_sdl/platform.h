@@ -11,16 +11,16 @@
 
 #include <core/common.h>
 #include <core/iface/keyboard.h>
+#include <core/iface/video.h>
 
 #include <impl_basic/random_crand.h>
 #include <impl_basic/timers_basic.h>
-#include <impl_basic/video_abstract.h>
 #include <impl_basic/sound_none.h>
 
 
 namespace chip8::sdl {
 
-struct sdl_system_facade_t : video_system_abstract_t,
+struct sdl_system_facade_t : video_system_iface_t,
                              keyboard_system_iface_t,
                              timers_system_basic_t,
                              random_system_crand_t,
@@ -91,7 +91,7 @@ struct sdl_system_facade_t : video_system_abstract_t,
         SDL_Quit();
     }
 
-    virtual void render_impl() override;
+    virtual void render(const video_memory_t& video_memory) override;
 
     virtual bool is_pressed(keyboard_key_t key) override;
 

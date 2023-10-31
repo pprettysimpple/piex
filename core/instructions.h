@@ -28,7 +28,11 @@ namespace instructions {
 inline constexpr auto CLS = instruction_t{
     "CLS",
     [](vm_t& vm, const opcode_t&) {
-        vm.video_system.clear_screen();
+        for (auto& row : vm.video_memory) {
+            std::fill(row.begin(), row.end(), false);
+        }
+        vm.video_system.render(vm.video_memory);
+        
         vm.next_instruction();
     }
 };
@@ -275,11 +279,33 @@ inline constexpr auto DRW_VX_VY_N = instruction_t{
 
         const auto sprite = bytes_view(vm.memory.begin() + vm.I, opcode.get_n());
 
-        vm.V[0xF] = vm.video_system.draw_sprite(
-            vm.V[opcode.get_x()] % VIDEO_WIDTH,
-            vm.V[opcode.get_y()] % VIDEO_HEIGHT,
-            sprite
-        ) ? 1 : 0;
+        auto start_col = vm.V[opcode.get_x()] % VIDEO_WIDTH;
+        auto start_row = vm.V[opcode.get_y()] % VIDEO_HEIGHT;
+
+        bool collision = false;
+        for (size_t row = 0; row < sprite.size(); ++row) {
+            uint8_t sprite_byte = sprite[row];
+            for (size_t col = 0; col < 8; ++col) {
+                if (start_col + col >= VIDEO_WIDTH || start_row + row >= VIDEO_HEIGHT) {
+                    continue;
+                }
+
+                bool sprite_pixel = (sprite_byte >> (7 - col)) & 0x01;
+
+                auto r = (start_row + row) % VIDEO_HEIGHT;
+                auto c = (start_col + col) % VIDEO_WIDTH;
+                bool& screen_pixel = vm.video_memory[r][c];
+
+                if (sprite_pixel && screen_pixel) {
+                    collision = true;
+                }
+                screen_pixel ^= sprite_pixel;
+            }
+        }
+
+        vm.V[0xF] = collision ? 1 : 0;
+
+        vm.video_system.render(vm.video_memory);
 
         vm.next_instruction();
     }
