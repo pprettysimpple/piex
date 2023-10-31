@@ -16,11 +16,11 @@
 int main(int argc, char** argv)
 {
     if (argc < 3) {
-        std::cerr << "usage: " << argv[0] << " <sdl|ascii> <rom>" << std::endl;
+        std::cerr << "usage: " << argv[0] << " <sdl|ascii> <ch8|sch|xoch> <rom>" << std::endl;
         return 1;
     }
 
-    std::string_view rom_filename(argv[2]);
+    std::string_view rom_filename(argv[3]);
 
     // read rom from file
     chip8::bytes_owned rom = std::invoke([rom_filename]() {
@@ -34,7 +34,18 @@ int main(int argc, char** argv)
     });
 
     auto settings = chip8::vm_t::settings_t{
-        .emulator_type = chip8::vm_t::settings_t::CHIP_8,
+        .emulator_type = std::invoke([argv]() {
+            if (std::string_view(argv[2]) == "ch8") {
+                return chip8::vm_t::settings_t::CHIP_8;
+            } else if (std::string_view(argv[2]) == "sch") {
+                return chip8::vm_t::settings_t::SCHIP1_1;
+            } else if (std::string_view(argv[2]) == "xoch") {
+                return chip8::vm_t::settings_t::XO_CHIP;
+            } else {
+                std::cerr << "invalid emulator type" << std::endl;
+                std::exit(EXIT_FAILURE);
+            }
+        }),
     };
 
     auto run_with_sdl = [settings, &rom]() mutable {
