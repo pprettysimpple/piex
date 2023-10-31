@@ -23,14 +23,8 @@ Then you can build project with cmake:
 ```bash
 mkdir build
 cd build
-cmake ..
-ninja all
-```
-
-And to clean build directory after some builds:
-
-```bash
-ninja clean
+cmake .. -DENABLE_SDL=1 # or -DENABLE_SDL=0 for tests-only build
+make
 ```
 
 ## Usage
