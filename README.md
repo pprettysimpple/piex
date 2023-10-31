@@ -36,14 +36,23 @@ ninja clean
 ## Usage
 
 ```bash
-./build/piexapp <sdl|ascii> <path_to_rom>
+./build/piexapp <sdl|ascii> <ch8|sch|xoch> <path_to_rom>
 ```
 
-This will run emulator with SDL2 or ascii-art system implementation. Depending on argument.
+First argument is platform implementation:
+- sdl - use sdl2 implementation
+- ascii - use ascii-art implementation, no keyboard support
+
+Second argument is emulation-type:
+- ch8 - chip8 type
+- sch - superchip type
+- xoch - xochip type
+
+Third argument is path to rom file.
 
 ## TODO
 
-- Add sound implementation in sdl build
-- Incapsulate quirks logic into core
-- Better deal with timers, only "display.wait" left for 100% tests
-- Implement rest of opcodes
+- Add sound implementation in sdl build, currently it is stub with no sound
+- Incapsulate quirks logic into core (move video memory to core, change interface to draw only per_pixel)
+- Better deal with timers, only "display.wait" left for 100% quirks tests
+- Implement the rest of opcodes
