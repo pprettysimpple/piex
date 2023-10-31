@@ -58,7 +58,7 @@ struct vm_t {
     random_system_iface_t& random_system;
     sound_system_iface_t& sound_system;
 
-    std::chrono::nanoseconds sum_exec_duration_mod_timer = std::chrono::nanoseconds::zero();
+    std::chrono::nanoseconds timers_duration = std::chrono::nanoseconds::zero();
 
     explicit vm_t(
         settings_t&& settings,

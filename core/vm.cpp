@@ -85,25 +85,25 @@ void vm_t::emulate_one_instruction() {
 
     wrap_instruction_execution(*this, {instruction, opcode});
 
-    sum_exec_duration_mod_timer += settings.op_duration;
+    timers_duration += settings.op_duration;
 }
 
 void vm_t::emulate_duration(std::chrono::nanoseconds target_duration) {
-    auto accumulated_duration = std::chrono::nanoseconds::zero();
-    while (accumulated_duration < target_duration) {
-        auto start_sum_duration = sum_exec_duration_mod_timer;
+    auto emulation_duration = std::chrono::nanoseconds::zero();
+    while (emulation_duration < target_duration) {
+        auto start_timers_duration = timers_duration;
         emulate_one_instruction();
-        auto elapsed = sum_exec_duration_mod_timer - start_sum_duration;
-        
-        accumulated_duration += elapsed;
+        auto elapsed = timers_duration - start_timers_duration;
+
+        emulation_duration += elapsed;
 
         auto play_sound_duration = std::chrono::nanoseconds::zero();
-        while (sum_exec_duration_mod_timer >= settings.timer_duration) {
-            sum_exec_duration_mod_timer -= settings.timer_duration;
+        while (timers_duration >= settings.timer_duration) {
+            timers_duration -= settings.timer_duration;
             play_sound_duration += settings.timer_duration;
 
-            delay_timer = std::max(0, delay_timer - 1);
-            sound_timer = std::max(0, sound_timer - 1);
+            delay_timer = delay_timer > 0 ? delay_timer - 1 : 0;
+            sound_timer = sound_timer > 0 ? sound_timer - 1 : 0;
             timers_system.tick(settings.timer_duration);
         }
 
