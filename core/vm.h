@@ -50,7 +50,7 @@ struct vm_t {
     // memory
     std::array<uint16_t, STACK_SIZE> stack;
     std::array<uint8_t, MEMORY_SIZE> memory;
-    video_memory_t video_memory;
+    video_memory_t video_memory{};
 
     // peripherals
     keyboard_system_iface_t& keyboard_system;

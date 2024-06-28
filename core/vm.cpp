@@ -73,7 +73,7 @@ vm_t::vm_t(
 }
 
 void vm_t::emulate_one_instruction() {
-    uint16_t opcode_bytes = memory[pc] << 8 | memory[pc + 1];
+    uint16_t opcode_bytes = memory[pc] << 8 | memory[static_cast<size_t>(pc + 1)];
     auto opcode = opcode_t{opcode_bytes};
     auto instruction_opt = decode_instruction(opcode);
 
