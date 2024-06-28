@@ -167,7 +167,7 @@ inline constexpr auto ADD_VX_VY = instruction_t{
         auto& target = vm.V[opcode.get_x()];
         auto value = vm.V[opcode.get_y()];
         uint16_t result = static_cast<uint16_t>(target) + static_cast<uint16_t>(value);
-        target = result;
+        target = static_cast<uint8_t>(result);
         if (result > 0xFF) {
             vm.V[0xF] = 1;
         } else {
@@ -273,11 +273,11 @@ inline constexpr auto RND_VX_BYTE = instruction_t{
 inline constexpr auto DRW_VX_VY_N = instruction_t{
     "DRW_VX_VY_N",
     [](vm_t& vm, const opcode_t& opcode) {
-        if (opcode.get_n() + vm.I > vm.memory.size()) {
+        if (static_cast<size_t>(opcode.get_n() + vm.I) > vm.memory.size()) {
             throw std::runtime_error("DRW_VX_VY_N: sprite out of bounds");
         }
 
-        const auto sprite = bytes_view(vm.memory.begin() + vm.I, opcode.get_n());
+        const auto sprite = bytes_view(vm.memory.data() + vm.I, opcode.get_n());
 
         auto start_col = vm.V[opcode.get_x()] % VIDEO_WIDTH;
         auto start_row = vm.V[opcode.get_y()] % VIDEO_HEIGHT;
@@ -385,8 +385,8 @@ inline constexpr auto LD_B_VX = instruction_t{
     [](vm_t& vm, const opcode_t& opcode) {
         uint8_t value = vm.V[opcode.get_x()];
         vm.memory[vm.I] = value / 100;
-        vm.memory[vm.I + 1] = (value / 10) % 10;
-        vm.memory[vm.I + 2] = value % 10;
+        vm.memory[static_cast<size_t>(vm.I + 1)] = (value / 10) % 10;
+        vm.memory[static_cast<size_t>(vm.I + 2)] = value % 10;
 
         vm.next_instruction();
     }
@@ -397,7 +397,7 @@ inline constexpr auto LD_I_VX = instruction_t{
     [](vm_t& vm, const opcode_t& opcode) {
         uint8_t size = opcode.get_x();
         for (uint8_t i = 0; i <= size; ++i) {
-            vm.memory[vm.I + i] = vm.V[i];
+            vm.memory[static_cast<size_t>(vm.I + i)] = vm.V[i];
         }
 
         if (vm.settings.emulator_type == vm_t::settings_t::emulator_type_t::CHIP_8) {
@@ -413,7 +413,7 @@ inline constexpr auto LD_VX_I = instruction_t{
     [](vm_t& vm, const opcode_t& opcode) {
         uint8_t size = opcode.get_x();
         for (uint8_t i = 0; i <= size; ++i) {
-            vm.V[i] = vm.memory[vm.I + i];
+            vm.V[i] = vm.memory[static_cast<size_t>(vm.I + i)];
         }
         
         if (vm.settings.emulator_type == vm_t::settings_t::emulator_type_t::CHIP_8) {

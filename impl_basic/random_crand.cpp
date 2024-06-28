@@ -7,7 +7,7 @@
 namespace chip8 {
 
 random_system_crand_t::random_system_crand_t() {
-    srand(time(nullptr));
+    srand(static_cast<unsigned int>(time(nullptr)));
 }
 
 uint8_t random_system_crand_t::get_random_byte() {
