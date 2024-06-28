@@ -40,11 +40,12 @@ sdl_system_facade_t::sdl_system_facade_t() {
 void sdl_system_facade_t::render(const video_memory_t& video_memory) {
     for (size_t i = 0; i < VIDEO_HEIGHT; ++i) {
         for (size_t j = 0; j < VIDEO_WIDTH; ++j) {
-            SDL_Rect rect;
-            rect.x = j * PIXEL_SIZE;
-            rect.y = i * PIXEL_SIZE;
-            rect.w = PIXEL_SIZE;
-            rect.h = PIXEL_SIZE;
+            SDL_Rect rect{
+                .x = static_cast<int>(j * PIXEL_SIZE),
+                .y = static_cast<int>(i * PIXEL_SIZE),
+                .w = PIXEL_SIZE,
+                .h = PIXEL_SIZE
+            };
 
             if (video_memory[i][j]) {
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
