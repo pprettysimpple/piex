@@ -1,6 +1,7 @@
 .cache
 .vscode
 .vs
+deps
 data
 
 build
