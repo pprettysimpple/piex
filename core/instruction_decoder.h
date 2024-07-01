@@ -5,7 +5,7 @@
 
 namespace chip8 {
 
-inline std::optional<std::reference_wrapper<const instruction_t>> decode_instruction(const opcode_t opcode) {
+inline std::optional<std::reference_wrapper<const instruction_t>> decode_instruction(opcode_t opcode) {
     switch (opcode.get_nibble<3>()) {
         case 0x0: switch (opcode.get_kk()) {
             case 0xE0: return std::cref(instructions::CLS);
