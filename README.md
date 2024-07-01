@@ -1,14 +1,20 @@
 # Piex
 
-This is an emulator of famous chip8 system. It is written in C++ and can be easily ported to any platform.
-Core of emulator is bundled with several different system implementations.
-Currently only SDL2 or ascii-art are available.
+This is an emulator of famous chip8 system. It is written in C++ as a pet-project.
+Core of emulator is bundled with opt-in SDL2 implementation or ascii.
+I want to spport all the quirks and all different versions of chip8. That is the goal, sort of.
 
 ## Table of Contents
 
+- [Implementation](#implementation)
 - [Build](#build)
 - [Usage](#usage)
 - [TODO](#todo)
+
+## Implementation
+
+- [Core](core/README.md)
+- [Core/iface](core/iface/README.md)
 
 ## Build
 

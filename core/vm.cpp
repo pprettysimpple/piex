@@ -73,8 +73,10 @@ vm_t::vm_t(
 }
 
 void vm_t::emulate_one_instruction() {
+    // fetch
     uint16_t opcode_bytes = memory[pc] << 8 | memory[static_cast<size_t>(pc + 1)];
     auto opcode = opcode_t{opcode_bytes};
+    // decode
     auto instruction_opt = decode_instruction(opcode);
 
     if (!instruction_opt) {
@@ -85,8 +87,10 @@ void vm_t::emulate_one_instruction() {
 
     const auto& instruction = instruction_opt.value().get();
 
+    // execute (might trigger some peripherals)
     wrap_instruction_execution(*this, {instruction, opcode});
 
+    // update peripherals
     timers_duration += settings.op_duration;
 
     auto play_sound_duration = std::chrono::nanoseconds::zero();

@@ -43,6 +43,7 @@ struct InstructionDeclarationHelper {
 /**
  * Each instruction is a lambda that takes a vm_t reference and an opcode_t reference.
  * Intruction mutates the vm_t and advances the program counter.
+ * Declaration is implemented with a really handy macro-hack from folly's SCOPE_EXIT
  */
 #define PIEX_INSTRUCTION(instruction_name)\
 inline constexpr auto instruction_name = detail::InstructionDeclarationHelper{.name = #instruction_name} + [](vm_t& vm, const opcode_t& opcode)
