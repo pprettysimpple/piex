@@ -45,7 +45,7 @@ void wrap_instruction_execution(vm_t& vm, const decoded_instruction_t& decoded_i
     }
 }
 
-}
+} // namespace
 
 
 vm_t::vm_t(
@@ -94,8 +94,8 @@ void vm_t::emulate_one_instruction() {
         timers_duration -= settings.timer_duration;
         play_sound_duration += settings.timer_duration;
 
-        delay_timer = delay_timer > 0 ? delay_timer - 1 : 0;
-        sound_timer = sound_timer > 0 ? sound_timer - 1 : 0;
+        delay_timer = (delay_timer > 0) ? (delay_timer - 1) : 0;
+        sound_timer = (sound_timer > 0) ? (sound_timer - 1) : 0;
         timers_system.tick(settings.timer_duration);
     }
 
